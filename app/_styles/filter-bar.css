@@ -1,17 +1,9 @@
 .filter-bar {
-  position: sticky; top: 0; z-index: 30;
-  background: rgba(247, 247, 244, 0.85);
-  backdrop-filter: saturate(140%) blur(16px);
-  -webkit-backdrop-filter: saturate(140%) blur(16px);
+  position: static;
+  background: transparent;
   border-bottom: 1px solid var(--line);
 }
-.filter-bar-bottom {
-  position: fixed; top: auto; bottom: 0; left: 0; right: 0;
-  border-bottom: 0;
-  border-top: 1px solid var(--line);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-:root[data-theme="dark"] .filter-bar { background: rgba(10, 11, 14, 0.78); }
+:root[data-theme="dark"] .filter-bar { background: transparent; }
 .filter-bar-inner {
   max-width: 1320px; margin: 0 auto; padding: 18px 28px 12px;
   display: flex; align-items: center; gap: 18px;

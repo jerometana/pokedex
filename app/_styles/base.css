@@ -9,7 +9,7 @@ body {
   line-height: 1.5;
 }
 
-.app { min-height: 100vh; padding-bottom: 180px; }
+.app { min-height: 100vh; }
 .main { margin: 0 auto; padding: 28px; }
 
 .empty { padding: 80px 20px; text-align: center; color: var(--ink-3); }
