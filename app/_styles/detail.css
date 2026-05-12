@@ -1,5 +1,9 @@
 .focus-wrap { display: flex; flex-direction: column; gap: 24px; }
 
+.detail-paginator {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+
 .stack-row {
   display: grid;
   grid-template-columns: 0.55fr 0.75fr 1.4fr 0.75fr 0.55fr;
@@ -89,6 +93,20 @@
   position: relative; z-index: 1;
   width: 240px; height: 240px; margin: 4px auto 10px;
 }
+.form-slider-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink-3); cursor: pointer; font-size: 20px; line-height: 1;
+  z-index: 3;
+  transition: color 120ms, transform 120ms, box-shadow 120ms, background 120ms;
+}
+.form-slider-arrow:hover { color: var(--ink); box-shadow: var(--shadow-sm); }
+.form-slider-arrow-l { left: 16px; }
+.form-slider-arrow-r { right: 16px; }
+.form-slider-arrow-l:hover { transform: translateY(-50%) translateX(-2px); }
+.form-slider-arrow-r:hover { transform: translateY(-50%) translateX(2px); }
 .focus-hero-name {
   font-family: var(--font-display); font-weight: 700;
   font-size: 40px; letter-spacing: -0.02em; line-height: 1;

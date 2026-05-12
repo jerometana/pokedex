@@ -26,7 +26,7 @@ export function StackCard({
         }}
       >
         <ArtImg
-          src={variant === "far" ? p.sprite : p.art}
+          src={p.art}
           alt={p.name}
           sizes={variant === "far" ? "120px" : "180px"}
           quality={variant === "far" ? 50 : 70}

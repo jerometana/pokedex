@@ -24,7 +24,7 @@ export function FormCard({
     >
       <div className="evo-art" style={{ position: "relative" }}>
         <Image
-          src={form.sprite}
+          src={form.art}
           alt={display}
           width={96}
           height={96}

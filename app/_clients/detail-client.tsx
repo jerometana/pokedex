@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import type { PokemonFull, PokemonLite } from "@/lib/types";
@@ -9,6 +10,7 @@ import { stackRowVariants } from "../_lib/animations";
 import { DetailHeader } from "../_components/detail-header";
 import { DetailPanels } from "../_components/detail-panels";
 import { FocusHero } from "../_components/focus-hero";
+import { ChevronLeftIcon, ChevronRightIcon } from "../_components/icons";
 import { StackCard } from "../_components/stack-card";
 import {
   accentStrengthFor,
@@ -72,13 +74,7 @@ export function DetailClient({
 
   return (
     <div className={`app density-${t.density}`}>
-      <DetailHeader
-        cur={full}
-        prev={prev}
-        next={next}
-        idx={idx}
-        total={pokemon.length}
-      />
+      <DetailHeader cur={full} />
       <main className="main">
         <div className="focus-wrap">
           <motion.div
@@ -97,11 +93,36 @@ export function DetailClient({
                 active={active}
                 accentStrength={accentStrength}
                 dir={0}
+                onSelectForm={setActiveFormId}
               />
             </AnimatePresence>
             <StackCard p={next} variant="side" />
             <StackCard p={next2} variant="far" />
           </motion.div>
+
+          <div className="detail-paginator">
+            <Link
+              href={pokemonHref(prev.id)}
+              className="nav-btn"
+              aria-label="Previous"
+            >
+              <ChevronLeftIcon />
+            </Link>
+            <div className="nav-progress">
+              <span style={{ fontWeight: 700, color: "var(--ink)" }}>
+                {idx + 1}
+              </span>
+              <span style={{ color: "#CBD5E1" }}>/</span>
+              <span style={{ color: "#94A3B8" }}>{pokemon.length}</span>
+            </div>
+            <Link
+              href={pokemonHref(next.id)}
+              className="nav-btn"
+              aria-label="Next"
+            >
+              <ChevronRightIcon />
+            </Link>
+          </div>
 
           <AnimatePresence mode="wait" initial={false}>
             <DetailPanels

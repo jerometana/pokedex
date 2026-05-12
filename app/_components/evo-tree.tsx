@@ -39,7 +39,7 @@ function EvoStage({ ev, active }: { ev: PokemonLite; active: boolean }) {
     >
       <div className="evo-art" style={{ position: "relative" }}>
         <Image
-          src={ev.sprite}
+          src={ev.art}
           alt={ev.name}
           width={96}
           height={96}
