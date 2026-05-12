@@ -4,7 +4,6 @@ export function ArtImg({
   src,
   alt,
   sizes,
-  preload = false,
   quality = 70,
   loading,
   fetchPriority,
@@ -12,7 +11,6 @@ export function ArtImg({
   src: string;
   alt: string;
   sizes: string;
-  preload?: boolean;
   quality?: number;
   loading?: "eager" | "lazy";
   fetchPriority?: "high" | "low" | "auto";
@@ -23,7 +21,6 @@ export function ArtImg({
       alt={alt}
       fill
       sizes={sizes}
-      preload={preload}
       loading={loading}
       fetchPriority={fetchPriority}
       style={{ objectFit: "contain" }}

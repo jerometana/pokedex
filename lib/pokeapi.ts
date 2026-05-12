@@ -516,27 +516,29 @@ export const getAllPokemonLite = cache(_getAllPokemonLite);
 async function _getAllPokemonLite(): Promise<PokemonLite[]> {
   const typeResults = await P.getTypeByName(TYPE_NAMES as unknown as string[]);
   const typesByPokemonId = new Map<number, PokeType[]>();
-  TYPE_NAMES.forEach((tname, ti) => {
-    for (const entry of typeResults[ti].pokemon) {
+  for (const t of typeResults) {
+    const tname = t.name as PokeType;
+    for (const entry of t.pokemon) {
       const id = urlToId(entry.pokemon.url);
       if (id > MAX_ID) continue;
       const arr = typesByPokemonId.get(id) ?? [];
       arr.push(tname);
       typesByPokemonId.set(id, arr);
     }
-  });
+  }
 
   const genNames = Object.keys(GEN_KEY);
   const genResults = await P.getGenerationByName(genNames);
   const genByPokemonId = new Map<number, Gen>();
-  genNames.forEach((gname, gi) => {
-    const gen = GEN_KEY[gname];
-    for (const sp of genResults[gi].pokemon_species) {
+  for (const g of genResults) {
+    const gen = GEN_KEY[g.name];
+    if (!gen) continue;
+    for (const sp of g.pokemon_species) {
       const id = urlToId(sp.url);
       if (id > MAX_ID) continue;
       genByPokemonId.set(id, gen);
     }
-  });
+  }
 
   const fullList = await P.getPokemonsList({ offset: 0, limit: 2000 });
 

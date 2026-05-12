@@ -31,6 +31,8 @@ body {
   display: inline-block;
   background: linear-gradient(90deg, var(--skeleton-a), var(--skeleton-b), var(--skeleton-a));
   background-size: 200% 100%;
-  animation: sk 1.4s linear infinite;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-bar { animation: sk 1.4s linear infinite; }
 }
 @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
