@@ -14,7 +14,8 @@
 .panel-moves { grid-area: moves; }
 .panel-evo { grid-area: evo; }
 .panel-forms { grid-area: forms; }
-.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.form-grid .form-stage { width: auto; flex: initial; max-width: none; }
 .panel-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .panel-h h3 { font-family: var(--font-display); font-weight: 700; font-size: 16px; margin: 0; letter-spacing: -0.005em; }
 .panel-tag { font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
@@ -31,12 +32,13 @@
 .move-arrow { color: var(--ink-3); font-size: 12px; opacity: 0; transition: opacity 140ms; }
 .move-row:hover .move-arrow { opacity: 1; }
 
-.evo-row { display: flex; align-items: stretch; justify-content: center; gap: 14px; padding: 6px 0 4px; flex-wrap: wrap; width: 100%; }
+.evo-row { display: flex; align-items: stretch; justify-content: flex-start; gap: 14px; width: 100%; overflow-x: auto; }
+.evo-row > .evo-row { display: contents; }
 .evo-stage {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: 20px; padding: 14px 18px;
   display: flex; flex-direction: column; align-items: center; gap: 4px;
-  cursor: pointer; max-width: 140px;
+  cursor: pointer; min-width: 140px;
   flex: 1 1 0;
   transition: transform 160ms, box-shadow 160ms, border-color 160ms;
 }
@@ -46,7 +48,7 @@
 .evo-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.12)); }
 .evo-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
 .evo-types { display: flex; gap: 4px; margin-top: 4px; }
-.evo-arrow { display: grid; place-items: center; color: var(--ink-3); }
+.evo-arrow { display: grid; place-items: center; color: var(--ink-3); flex: 0 0 auto; }
 .evo-branches { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .evo-branches .evo-row { justify-content: flex-start; gap: 10px; }
 
