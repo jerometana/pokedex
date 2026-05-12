@@ -49,6 +49,11 @@ export function DetailClient({
     [full.forms, activeFormId, defaultForm],
   );
 
+  const handleSelectForm = (id: number) => {
+    setActiveFormId(id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const idx = Math.max(
     0,
     pokemon.findIndex((p) => p.id === full.id),
@@ -96,7 +101,7 @@ export function DetailClient({
                 active={active}
                 accentStrength={accentStrength}
                 dir={dir}
-                onSelectForm={setActiveFormId}
+                onSelectForm={handleSelectForm}
               />
             </AnimatePresence>
             <StackCard p={next} variant="side" navDir={1} />
@@ -134,7 +139,7 @@ export function DetailClient({
               key={full.id}
               full={full}
               active={active}
-              onSelectForm={setActiveFormId}
+              onSelectForm={handleSelectForm}
               liteById={liteById}
               dir={dir}
             />

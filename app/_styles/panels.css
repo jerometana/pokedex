@@ -27,9 +27,14 @@
 .panel-matchups { grid-area: matchups; }
 .panel-moves { grid-area: moves; }
 .panel-evo { grid-area: evo; }
-.panel-forms { grid-area: forms; }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.form-grid .form-stage { width: auto; flex: initial; max-width: none; }
+.panel-forms { grid-area: forms; background: transparent; border: none; padding: 0; box-shadow: none; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.form-grid .form-stage {
+  width: auto; flex: initial; max-width: none; min-width: 0;
+  max-height: none; padding: 14px; border-radius: 22px; gap: 6px;
+}
+.form-grid .form-stage .evo-art { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+.form-grid .form-stage .evo-name { font-size: 16px; }
 .panel-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .panel-h h3 { font-family: var(--font-display); font-weight: 700; font-size: 16px; margin: 0; letter-spacing: -0.005em; }
 .panel-tag { font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
@@ -270,7 +275,9 @@
   .detail-grid { gap: 12px; }
   .panel { padding: 14px 14px; border-radius: 20px; }
   .panel-h h3 { font-size: 15px; }
-  .form-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .form-grid { grid-template-columns: repeat(auto-fill, minmax(min(150px, 44vw), 1fr)); gap: 10px; }
+  .form-grid .form-stage { padding: 10px; border-radius: 18px; }
+  .form-grid .form-stage .evo-name { font-size: 14px; }
   .movepool-table { font-size: 12px; }
   .movepool-table th, .movepool-table td { padding: 6px 6px; }
   .mp-lv { width: 32px; }
@@ -286,7 +293,8 @@
   .ability-tip { width: 220px; }
 }
 @media (max-width: 420px) {
-  .form-grid { grid-template-columns: repeat(auto-fill, minmax(min(110px, 44vw), 1fr)); }
+  .form-grid { grid-template-columns: repeat(auto-fill, minmax(min(130px, 44vw), 1fr)); }
+  .form-grid .form-stage .evo-name { font-size: 13px; }
   .movepool-table .mp-class { display: none; }
   .matchup-row { grid-template-columns: 48px 1fr; }
 }
