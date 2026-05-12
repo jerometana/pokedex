@@ -58,10 +58,32 @@
   position: relative; z-index: 1; width: 100%;
   display: flex; justify-content: space-between; align-items: center;
 }
+.focus-hero-top-right {
+  display: flex; align-items: center; gap: 10px;
+}
 .focus-hero-gen {
   font-family: var(--font-mono); font-size: 11px; font-weight: 600;
   color: var(--ink-3); letter-spacing: 0.5px; text-transform: uppercase;
   white-space: nowrap;
+}
+.shiny-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink-3); cursor: pointer;
+  transition: color 120ms ease, background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+.shiny-toggle:hover { color: var(--ink); transform: translateY(-1px); }
+.shiny-toggle.on {
+  color: #B45309;
+  background: #FFF7E0;
+  border-color: #F5D77A;
+  box-shadow: 0 0 0 3px rgba(245, 215, 122, 0.25);
+}
+:root[data-theme="dark"] .shiny-toggle.on {
+  color: #FBE38A;
+  background: rgba(245, 215, 122, 0.12);
+  border-color: rgba(245, 215, 122, 0.45);
 }
 .focus-hero-art {
   position: relative; z-index: 1;

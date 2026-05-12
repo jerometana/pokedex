@@ -1,5 +1,10 @@
 .tweaks-panel {
   position: fixed; right: 16px; bottom: 16px; z-index: 100;
+}
+.app:has(.filter-bar-bottom) .tweaks-panel {
+  bottom: calc(16px + 140px);
+}
+.tweaks-panel {
   width: 264px;
   background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(20px) saturate(160%);

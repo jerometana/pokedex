@@ -59,7 +59,7 @@ export function FilterBar({
   count: number;
 }) {
   return (
-    <header className="filter-bar">
+    <header className="filter-bar filter-bar-bottom">
       <div className="filter-bar-inner">
         <Brand subtitle={`${count} entries`} />
 

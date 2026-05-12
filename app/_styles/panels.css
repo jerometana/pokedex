@@ -49,8 +49,8 @@
 .evo-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
 .evo-types { display: flex; gap: 4px; margin-top: 4px; }
 .evo-arrow { display: grid; place-items: center; color: var(--ink-3); flex: 0 0 auto; }
-.evo-branches { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.evo-branches .evo-row { justify-content: flex-start; gap: 10px; }
+.evo-branches { display: flex; flex-direction: column; gap: 10px; align-items: stretch; flex: 1 1 0; min-width: 140px; }
+.evo-branches .evo-row { justify-content: flex-start; gap: 10px; width: 100%; }
 
 .density-compact .focus-hero { padding: 22px 24px 24px; }
 .density-compact .focus-hero-art { width: 200px; height: 200px; }

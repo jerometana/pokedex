@@ -2,11 +2,17 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants, heroVariants } from "../_lib/animations";
+import { SparkleIcon } from "./icons";
 import { Num } from "./num";
 import { TypeChip } from "./type-chip";
+
+function toShiny(url: string): string {
+  return url.replace("/official-artwork/", "/official-artwork/shiny/");
+}
 
 export function FocusHero({
   full,
@@ -19,6 +25,7 @@ export function FocusHero({
   accentStrength: number;
   dir: 1 | -1 | 0;
 }) {
+  const [shiny, setShiny] = useState(false);
   const primary = TYPE_COLORS[active.types[0]];
   const tintBg = accentStrength
     ? `linear-gradient(180deg, ${mixWithWhite(primary.bg, accentStrength)} 0%, var(--card-bg) 78%)`
@@ -26,6 +33,7 @@ export function FocusHero({
   const displayName = active.isDefault
     ? full.name
     : `${full.name} (${active.label})`;
+  const heroArt = shiny ? toShiny(active.art) : active.art;
   return (
     <motion.article
       className="focus-hero"
@@ -48,13 +56,27 @@ export function FocusHero({
       </div>
 
       <div className="focus-hero-top">
-        <Num id={full.id} />
-        <div className="focus-hero-gen">Gen {romanize(full.gen)}</div>
+        <div style={{ display: "flex", gap: 16 }}>
+          <Num id={full.id} />
+          <div className="focus-hero-gen">Gen {romanize(full.gen)}</div>
+        </div>
+        <div className="focus-hero-top-right">
+          <button
+            type="button"
+            className={`shiny-toggle ${shiny ? "on" : ""}`}
+            onClick={() => setShiny((v) => !v)}
+            aria-pressed={shiny}
+            aria-label={shiny ? "Hide shiny" : "Show shiny"}
+            title={shiny ? "Hide shiny" : "Show shiny"}
+          >
+            <SparkleIcon size={24} />
+          </button>
+        </div>
       </div>
 
       <div className="focus-hero-art">
         <motion.div
-          key={active.id}
+          key={`${active.id}-${shiny ? "s" : "n"}`}
           className="sprite-img"
           style={{
             position: "relative",
@@ -68,12 +90,12 @@ export function FocusHero({
           animate="center"
         >
           <Image
-            src={active.art}
-            alt={displayName}
+            src={heroArt}
+            alt={shiny ? `${displayName} (Shiny)` : displayName}
             fill
             sizes="(max-width: 900px) 60vw, 280px"
             quality={85}
-            preload
+            loading="eager"
             fetchPriority="high"
             style={{ objectFit: "contain" }}
           />

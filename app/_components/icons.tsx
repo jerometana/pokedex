@@ -100,6 +100,21 @@ export function ChevronLeftIcon() {
   );
 }
 
+export function SparkleIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M12 2.5 13.7 9 20 10.5 13.7 12 12 18.5 10.3 12 4 10.5 10.3 9z" />
+      <path d="M19 14.5 19.7 17 22 17.7 19.7 18.5 19 21 18.3 18.5 16 17.7 18.3 17z" />
+    </svg>
+  );
+}
+
 export function ChevronRightIcon() {
   return (
     <svg

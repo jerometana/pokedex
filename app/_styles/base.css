@@ -9,8 +9,8 @@ body {
   line-height: 1.5;
 }
 
-.app { min-height: 100vh; padding-bottom: 80px; }
-.main { max-width: 1320px; margin: 0 auto; padding: 28px; }
+.app { min-height: 100vh; padding-bottom: 180px; }
+.main { margin: 0 auto; padding: 28px; }
 
 .empty { padding: 80px 20px; text-align: center; color: var(--ink-3); }
 .empty h3 { font-family: var(--font-display); margin: 12px 0 4px; color: var(--ink); font-size: 18px; }
