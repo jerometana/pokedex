@@ -42,6 +42,22 @@ export type Gen = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export const ALL_GENS: Gen[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+export type FormCategory = "mega" | "gmax" | "regional" | "primal";
+
+export const ALL_FORM_CATEGORIES: FormCategory[] = [
+  "mega",
+  "gmax",
+  "regional",
+  "primal",
+];
+
+export const FORM_LABELS: Record<FormCategory, string> = {
+  mega: "Mega",
+  gmax: "Gigantamax",
+  regional: "Regional",
+  primal: "Primal",
+};
+
 export type PokemonLite = {
   id: number;
   name: string;
@@ -49,6 +65,7 @@ export type PokemonLite = {
   types: PokeType[];
   art: string;
   sprite: string;
+  formTags: FormCategory[];
 };
 
 export type PokemonForm = {

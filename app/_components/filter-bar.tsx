@@ -1,9 +1,12 @@
 "use client";
 
 import {
+  ALL_FORM_CATEGORIES,
   ALL_GENS,
   ALL_TYPES,
+  FORM_LABELS,
   TYPE_COLORS,
+  type FormCategory,
   type Gen as GenNum,
   type PokeType,
 } from "@/lib/types";
@@ -25,6 +28,9 @@ const TYPE_OPTIONS: { value: PokeType; label: string }[] = ALL_TYPES.map(
   }),
 );
 
+const FORM_OPTIONS: { value: FormCategory; label: string }[] =
+  ALL_FORM_CATEGORIES.map((f) => ({ value: f, label: FORM_LABELS[f] }));
+
 export function FilterBar({
   query,
   setQuery,
@@ -34,6 +40,9 @@ export function FilterBar({
   activeGens,
   toggleGen,
   clearGens,
+  activeForms,
+  toggleForm,
+  clearForms,
   count,
 }: {
   query: string;
@@ -44,6 +53,9 @@ export function FilterBar({
   activeGens: Set<GenNum>;
   toggleGen: (g: GenNum) => void;
   clearGens: () => void;
+  activeForms: Set<FormCategory>;
+  toggleForm: (f: FormCategory) => void;
+  clearForms: () => void;
   count: number;
 }) {
   return (
@@ -113,13 +125,24 @@ export function FilterBar({
             );
           }}
         />
-        {(activeGens.size > 0 || activeTypes.size > 0) && (
+        <MultiDropdown
+          label="Form"
+          options={FORM_OPTIONS}
+          selected={activeForms}
+          onToggle={toggleForm}
+          onClear={clearForms}
+          width={200}
+        />
+        {(activeGens.size > 0 ||
+          activeTypes.size > 0 ||
+          activeForms.size > 0) && (
           <button
             type="button"
             className="filter-clear-all"
             onClick={() => {
               clearGens();
               clearTypes();
+              clearForms();
             }}
           >
             Clear all

@@ -1,6 +1,7 @@
 import Pokedex from "pokedex-promise-v2";
 import type {
   EvolutionNode,
+  FormCategory,
   Gen,
   PokeType,
   PokemonForm,
@@ -80,6 +81,20 @@ function pickFlavor(species: Pokedex.PokemonSpecies): string {
     if (hit) return hit.flavor_text;
   }
   return en[0]?.flavor_text ?? "";
+}
+
+const REGIONAL_SUFFIXES = new Set(["alola", "galar", "hisui", "paldea"]);
+
+function detectFormCategory(suffix: string): FormCategory | null {
+  if (!suffix) return null;
+  const tokens = suffix.split("-");
+  if (tokens.includes("mega")) return "mega";
+  if (tokens.includes("gmax")) return "gmax";
+  if (tokens.includes("primal")) return "primal";
+  for (const r of REGIONAL_SUFFIXES) {
+    if (tokens.includes(r)) return "regional";
+  }
+  return null;
 }
 
 const FORM_LABEL_MAP: Record<string, string> = {
@@ -192,6 +207,8 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
   const forms = formsRaw.filter((f): f is PokemonForm => f !== null);
   forms.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 
+  const formTags = deriveFormTags(species.name, forms.map((f) => f.slug));
+
   return {
     id: pkmn.id,
     name: titleCase(pkmn.name),
@@ -207,7 +224,21 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     art: ART(pkmn.id),
     sprite: SPRITE(pkmn.id),
     forms,
+    formTags,
   };
+}
+
+function deriveFormTags(speciesSlug: string, formSlugs: string[]): FormCategory[] {
+  const set = new Set<FormCategory>();
+  for (const slug of formSlugs) {
+    if (slug === speciesSlug) continue;
+    const suffix = slug.startsWith(`${speciesSlug}-`)
+      ? slug.slice(speciesSlug.length + 1)
+      : slug;
+    const cat = detectFormCategory(suffix);
+    if (cat) set.add(cat);
+  }
+  return Array.from(set);
 }
 
 export async function getAllPokemonLite(): Promise<PokemonLite[]> {
@@ -235,22 +266,56 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
     }
   });
 
-  const list = await P.getPokemonsList({ offset: 0, limit: MAX_ID });
+  const fullList = await P.getPokemonsList({ offset: 0, limit: 20000 });
+
+  const baseEntries: { id: number; name: string }[] = [];
+  const formEntries: { id: number; name: string }[] = [];
+  for (const entry of fullList.results) {
+    const id = urlToId(entry.url);
+    if (id <= MAX_ID) baseEntries.push({ id, name: entry.name });
+    else formEntries.push({ id, name: entry.name });
+  }
+
+  const baseSlugs = baseEntries
+    .map((e) => e.name)
+    .sort((a, b) => b.length - a.length);
+
+  const tagsBySpeciesId = new Map<number, Set<FormCategory>>();
+  const slugToId = new Map<string, number>(
+    baseEntries.map((e) => [e.name, e.id]),
+  );
+
+  for (const form of formEntries) {
+    const speciesSlug = baseSlugs.find(
+      (s) => form.name === s || form.name.startsWith(`${s}-`),
+    );
+    if (!speciesSlug) continue;
+    const suffix = form.name === speciesSlug
+      ? ""
+      : form.name.slice(speciesSlug.length + 1);
+    const cat = detectFormCategory(suffix);
+    if (!cat) continue;
+    const speciesId = slugToId.get(speciesSlug);
+    if (speciesId == null) continue;
+    const cur = tagsBySpeciesId.get(speciesId) ?? new Set<FormCategory>();
+    cur.add(cat);
+    tagsBySpeciesId.set(speciesId, cur);
+  }
 
   const lite: PokemonLite[] = [];
-  for (const entry of list.results) {
-    const id = urlToId(entry.url);
-    if (id > MAX_ID) continue;
+  for (const entry of baseEntries) {
+    const { id, name } = entry;
     const types = typesByPokemonId.get(id);
     const gen = genByPokemonId.get(id);
     if (!types || !gen) continue;
     lite.push({
       id,
-      name: titleCase(entry.name),
+      name: titleCase(name),
       gen,
       types,
       art: ART(id),
       sprite: SPRITE(id),
+      formTags: Array.from(tagsBySpeciesId.get(id) ?? []),
     });
   }
 
