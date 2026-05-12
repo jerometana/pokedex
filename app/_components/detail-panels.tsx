@@ -1,8 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
-import { detailVariants } from "../_lib/animations";
 import { evoLabel, EvoTree } from "./evo-tree";
 import { FormCard } from "./form-card";
 import { MatchupChart } from "./matchup-chart";
@@ -47,15 +45,9 @@ export function DetailPanels({
   const altForms = full.forms.filter((f) => !f.isDefault);
   const hasEvolution = full.evolution.children.length > 0;
 
+  void dir;
   return (
-    <motion.div
-      className="detail-grid"
-      custom={dir}
-      variants={detailVariants}
-      initial="enter"
-      animate="center"
-      exit="exit"
-    >
+    <div className="detail-grid">
       <section className="panel panel-stats">
         <header className="panel-h">
           <h3>Base stats</h3>
@@ -137,6 +129,6 @@ export function DetailPanels({
           </div>
         </section>
       )}
-    </motion.div>
+    </div>
   );
 }

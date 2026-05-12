@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { PokemonFull, PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
 import { consumeNavDir, setNavDir, stackRowVariants } from "../_lib/animations";
@@ -86,16 +86,14 @@ export function DetailClient({
           >
             <StackCard p={prev2} variant="far" navDir={-1} />
             <StackCard p={prev} variant="side" navDir={-1} />
-            <AnimatePresence mode="wait" initial={false}>
-              <FocusHero
-                key={full.id}
-                full={full}
-                active={active}
-                accentStrength={accentStrength}
-                dir={dir}
-                onSelectForm={handleSelectForm}
-              />
-            </AnimatePresence>
+            <FocusHero
+              key={full.id}
+              full={full}
+              active={active}
+              accentStrength={accentStrength}
+              dir={dir}
+              onSelectForm={handleSelectForm}
+            />
             <StackCard p={next} variant="side" navDir={1} />
             <StackCard p={next2} variant="far" navDir={1} />
           </motion.div>
@@ -128,16 +126,14 @@ export function DetailClient({
             </Link>
           </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            <DetailPanels
-              key={full.id}
-              full={full}
-              active={active}
-              onSelectForm={handleSelectForm}
-              liteById={evoLites}
-              dir={dir}
-            />
-          </AnimatePresence>
+          <DetailPanels
+            key={full.id}
+            full={full}
+            active={active}
+            onSelectForm={handleSelectForm}
+            liteById={evoLites}
+            dir={dir}
+          />
         </div>
       </main>
     </div>

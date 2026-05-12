@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
-import { artVariants, heroVariants } from "../_lib/animations";
+import { artVariants } from "../_lib/animations";
 import { AbilityChip } from "./ability-chip";
 import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
@@ -60,15 +60,7 @@ export function FocusHero({
     onSelectForm(full.forms[nextIdx].id);
   };
   return (
-    <motion.article
-      className="focus-hero"
-      style={{ background: tintBg }}
-      custom={dir}
-      variants={heroVariants}
-      initial="enter"
-      animate="center"
-      exit="exit"
-    >
+    <article className="focus-hero" style={{ background: tintBg }}>
       <div className="focus-hero-bg" aria-hidden>
         <div
           className="focus-hero-blob"
@@ -201,6 +193,6 @@ export function FocusHero({
           </div>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
