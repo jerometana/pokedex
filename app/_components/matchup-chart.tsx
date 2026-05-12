@@ -1,11 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  ALL_TYPES,
-  type DamageRelations,
-  type PokeType,
-} from "@/lib/types";
+import { ALL_TYPES, type DamageRelations, type PokeType } from "@/lib/types";
 import { TypeChip } from "./type-chip";
 
 type Bucket = { label: string; mult: number; types: PokeType[] };
@@ -13,8 +9,8 @@ type Bucket = { label: string; mult: number; types: PokeType[] };
 const BUCKETS: { label: string; mult: number }[] = [
   { label: "4×", mult: 4 },
   { label: "2×", mult: 2 },
-  { label: "½×", mult: 0.5 },
-  { label: "¼×", mult: 0.25 },
+  { label: "0.5×", mult: 0.5 },
+  { label: "0.25×", mult: 0.25 },
   { label: "0×", mult: 0 },
 ];
 
@@ -55,13 +51,9 @@ export function MatchupChart({
   return (
     <div className="matchup">
       {buckets.map((b) => (
-        <div
-          key={b.label}
-          className={`matchup-row matchup-${multKey(b.mult)}`}
-        >
+        <div key={b.label} className={`matchup-row matchup-${multKey(b.mult)}`}>
           <div className="matchup-label">
             <span className="matchup-mult">{b.label}</span>
-            <span className="matchup-count">{b.types.length}</span>
           </div>
           <div className="matchup-types">
             {b.types.map((t) => (

@@ -1,11 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  TYPE_COLORS,
-  type PokemonForm,
-  type PokemonFull,
-} from "@/lib/types";
+import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { detailVariants } from "../_lib/animations";
 import { evoLabel, EvoTree } from "./evo-tree";
 import { FormCard } from "./form-card";
@@ -19,7 +15,7 @@ const STAT_ROWS: [string, keyof PokemonFull["stats"]][] = [
   ["ATK", "atk"],
   ["DEF", "def"],
   ["SpA", "spA"],
-  ["SpD", "spD"],
+  ["SpDef", "spD"],
   ["SPD", "spd"],
 ];
 
@@ -27,7 +23,9 @@ function vgLabel(slug: string | null): string {
   if (!slug) return "";
   return slug
     .split("-")
-    .map((w) => (w.length <= 2 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)))
+    .map((w) =>
+      w.length <= 2 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1),
+    )
     .join(" ");
 }
 

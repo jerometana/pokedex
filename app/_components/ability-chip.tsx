@@ -9,15 +9,21 @@ export function AbilityChip({
   ability: Ability;
   detail?: AbilityDetail;
 }) {
-  const has = !!detail && (detail.shortEffect || detail.effect || detail.flavor);
+  const has =
+    !!detail && (detail.shortEffect || detail.effect || detail.flavor);
   return (
     <span className={`ability-chip ${has ? "has-tip" : ""}`} tabIndex={0}>
-      <span className="ability-name">{ability.name}</span>
       {ability.isHidden && (
-        <span className="ability-hidden" title="Hidden ability" aria-label="Hidden">
-          H
+        <span
+          className="ability-hidden"
+          title="Hidden ability"
+          aria-label="Hidden"
+        >
+          ✦
         </span>
       )}
+      <span className="ability-name">{ability.name}</span>
+
       {has && (
         <span className="ability-tip" role="tooltip">
           {detail!.shortEffect && (
