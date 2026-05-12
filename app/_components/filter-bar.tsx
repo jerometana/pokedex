@@ -3,12 +3,16 @@
 import {
   ALL_FORM_CATEGORIES,
   ALL_GENS,
+  ALL_RARITIES,
   ALL_TYPES,
   FORM_LABELS,
+  RARITY_LABELS,
+  RARITY_STYLES,
   TYPE_COLORS,
   type FormCategory,
   type Gen as GenNum,
   type PokeType,
+  type Rarity,
 } from "@/lib/types";
 import { romanize } from "../_lib/helpers";
 import { CloseIcon, SearchIcon } from "./icons";
@@ -30,6 +34,10 @@ const TYPE_OPTIONS: { value: PokeType; label: string }[] = ALL_TYPES.map(
 const FORM_OPTIONS: { value: FormCategory; label: string }[] =
   ALL_FORM_CATEGORIES.map((f) => ({ value: f, label: FORM_LABELS[f] }));
 
+const RARITY_OPTIONS: { value: Rarity; label: string }[] = ALL_RARITIES.map(
+  (r) => ({ value: r, label: RARITY_LABELS[r] }),
+);
+
 export function FilterBar({
   query,
   setQuery,
@@ -42,6 +50,9 @@ export function FilterBar({
   activeForms,
   toggleForm,
   clearForms,
+  activeRarities,
+  toggleRarity,
+  clearRarities,
   count,
 }: {
   query: string;
@@ -55,6 +66,9 @@ export function FilterBar({
   activeForms: Set<FormCategory>;
   toggleForm: (f: FormCategory) => void;
   clearForms: () => void;
+  activeRarities: Set<Rarity>;
+  toggleRarity: (r: Rarity) => void;
+  clearRarities: () => void;
   count: number;
 }) {
   return (
@@ -137,9 +151,70 @@ export function FilterBar({
             onClear={clearForms}
             width={200}
           />
+          <MultiDropdown
+            label="Rarity"
+            options={RARITY_OPTIONS}
+            selected={activeRarities}
+            onToggle={toggleRarity}
+            onClear={clearRarities}
+            width={200}
+            renderTriggerChip={(o) => {
+              const s = RARITY_STYLES[o.value];
+              return (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    background: s.bg,
+                    color: s.fg,
+                    fontWeight: 600,
+                    fontSize: 11,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 999,
+                      background: s.chip,
+                    }}
+                  />
+                  {o.label}
+                </span>
+              );
+            }}
+            renderOption={(o, on) => {
+              const s = RARITY_STYLES[o.value];
+              return (
+                <span
+                  className="dd-type"
+                  style={
+                    on
+                      ? {
+                          background: s.bg,
+                          color: s.fg,
+                          padding: "3px 10px",
+                          borderRadius: 999,
+                        }
+                      : undefined
+                  }
+                >
+                  <span
+                    className="dd-type-dot"
+                    style={{ background: s.chip }}
+                  />
+                  <span>{o.label}</span>
+                </span>
+              );
+            }}
+          />
           {(activeGens.size > 0 ||
             activeTypes.size > 0 ||
-            activeForms.size > 0) && (
+            activeForms.size > 0 ||
+            activeRarities.size > 0) && (
             <button
               type="button"
               className="filter-clear-all"
@@ -147,6 +222,7 @@ export function FilterBar({
                 clearGens();
                 clearTypes();
                 clearForms();
+                clearRarities();
               }}
             >
               <CloseIcon />

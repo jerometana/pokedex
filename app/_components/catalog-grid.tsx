@@ -7,6 +7,7 @@ import { pokemonHref } from "../_lib/helpers";
 import { useInfinitePage } from "../_lib/use-infinite-page";
 import { ArtImg } from "./art-img";
 import { Num } from "./num";
+import { RarityBadges } from "./rarity-badge";
 import { TypeChip } from "./type-chip";
 import type { Density } from "./tweaks";
 
@@ -54,6 +55,21 @@ export function CatalogGrid({
                   fetchPriority={i < 12 ? "high" : undefined}
                 />
               </div>
+              {p.rarity.length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    left: 8,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 4,
+                    zIndex: 1,
+                  }}
+                >
+                  <RarityBadges rarities={p.rarity} />
+                </div>
+              )}
             </div>
             <div className="grid-card-foot">
               <Num id={p.id} />

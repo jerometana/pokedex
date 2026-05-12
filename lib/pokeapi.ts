@@ -1,4 +1,5 @@
 import Pokedex from "pokedex-promise-v2";
+import { rarityFor } from "./rarity";
 import type {
   EvolutionNode,
   FormCategory,
@@ -243,6 +244,7 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     sprite: SPRITE(pkmn.id),
     forms,
     formTags,
+    rarity: rarityFor(pkmn.id),
     names: pickLocalizedNames(species),
   };
 }
@@ -335,6 +337,7 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
       art: ART(id),
       sprite: SPRITE(id),
       formTags: Array.from(tagsBySpeciesId.get(id) ?? []),
+      rarity: rarityFor(id),
     });
   }
 

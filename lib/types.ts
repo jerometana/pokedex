@@ -60,6 +60,22 @@ export const FORM_LABELS: Record<FormCategory, string> = {
   primal: "Primal",
 };
 
+export type Rarity = "legendary" | "mythical" | "baby";
+
+export const ALL_RARITIES: Rarity[] = ["legendary", "mythical", "baby"];
+
+export const RARITY_LABELS: Record<Rarity, string> = {
+  legendary: "Legendary",
+  mythical: "Mythical",
+  baby: "Baby",
+};
+
+export const RARITY_STYLES: Record<Rarity, { bg: string; fg: string; chip: string }> = {
+  legendary: { bg: "#FFF6DC", fg: "#7C4A03", chip: "#E0A521" },
+  mythical:  { bg: "#F0E6FF", fg: "#5B21B6", chip: "#8B5CF6" },
+  baby:      { bg: "#FFE9F1", fg: "#9D174D", chip: "#F472B6" },
+};
+
 export type PokemonLite = {
   id: number;
   name: string;
@@ -68,6 +84,7 @@ export type PokemonLite = {
   art: string;
   sprite: string;
   formTags: FormCategory[];
+  rarity: Rarity[];
 };
 
 export type PokemonForm = {

@@ -5,11 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ALL_FORM_CATEGORIES,
   ALL_GENS,
+  ALL_RARITIES,
   ALL_TYPES,
   type FormCategory,
   type Gen as GenNum,
   type PokeType,
   type PokemonLite,
+  type Rarity,
 } from "@/lib/types";
 import { CatalogGrid } from "../_components/catalog-grid";
 import { Empty } from "../_components/empty";
@@ -20,10 +22,12 @@ const Q_KEY = "q";
 const GENS_KEY = "gens";
 const TYPES_KEY = "types";
 const FORMS_KEY = "forms";
+const RARITY_KEY = "rarity";
 
 const ALL_TYPES_SET = new Set<string>(ALL_TYPES);
 const ALL_GENS_SET = new Set<number>(ALL_GENS);
 const ALL_FORMS_SET = new Set<string>(ALL_FORM_CATEGORIES);
+const ALL_RARITIES_SET = new Set<string>(ALL_RARITIES);
 
 function parseTypes(raw: string | null): Set<PokeType> {
   if (!raw) return new Set();
@@ -49,6 +53,13 @@ function parseForms(raw: string | null): Set<FormCategory> {
   );
 }
 
+function parseRarities(raw: string | null): Set<Rarity> {
+  if (!raw) return new Set();
+  return new Set(
+    raw.split(",").filter((v) => ALL_RARITIES_SET.has(v)) as Rarity[],
+  );
+}
+
 export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
   const { t, setTweak } = useTweaks();
   const router = useRouter();
@@ -66,6 +77,10 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
   );
   const activeForms = useMemo(
     () => parseForms(searchParams.get(FORMS_KEY)),
+    [searchParams],
+  );
+  const activeRarities = useMemo(
+    () => parseRarities(searchParams.get(RARITY_KEY)),
     [searchParams],
   );
 
@@ -147,6 +162,23 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
     [writeParams],
   );
 
+  const toggleRarity = useCallback(
+    (r: Rarity) => {
+      writeParams((p) => {
+        const cur = parseRarities(p.get(RARITY_KEY));
+        if (cur.has(r)) cur.delete(r);
+        else cur.add(r);
+        if (cur.size) p.set(RARITY_KEY, Array.from(cur).join(","));
+        else p.delete(RARITY_KEY);
+      });
+    },
+    [writeParams],
+  );
+  const clearRarities = useCallback(
+    () => writeParams((p) => p.delete(RARITY_KEY)),
+    [writeParams],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return pokemon.filter((p) => {
@@ -160,11 +192,13 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         return false;
       if (activeForms.size > 0 && !p.formTags.some((f) => activeForms.has(f)))
         return false;
+      if (activeRarities.size > 0 && !p.rarity.some((r) => activeRarities.has(r)))
+        return false;
       return true;
     });
-  }, [pokemon, query, activeGens, activeTypes, activeForms]);
+  }, [pokemon, query, activeGens, activeTypes, activeForms, activeRarities]);
 
-  const resetKey = `${query}|${Array.from(activeGens).sort().join(",")}|${Array.from(activeTypes).sort().join(",")}|${Array.from(activeForms).sort().join(",")}`;
+  const resetKey = `${query}|${Array.from(activeGens).sort().join(",")}|${Array.from(activeTypes).sort().join(",")}|${Array.from(activeForms).sort().join(",")}|${Array.from(activeRarities).sort().join(",")}`;
 
   return (
     <div className={`app density-${t.density}`}>
@@ -180,6 +214,9 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         activeForms={activeForms}
         toggleForm={toggleForm}
         clearForms={clearForms}
+        activeRarities={activeRarities}
+        toggleRarity={toggleRarity}
+        clearRarities={clearRarities}
         count={filtered.length}
       />
       <main className="main">

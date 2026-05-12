@@ -8,6 +8,7 @@ import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants, heroVariants } from "../_lib/animations";
 import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
+import { RarityBadges } from "./rarity-badge";
 import { TypeChip } from "./type-chip";
 
 function toShiny(url: string): string {
@@ -78,9 +79,10 @@ export function FocusHero({
       </div>
 
       <div className="focus-hero-top">
-        <div style={{ display: "flex", gap: 16 }}>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <Num id={full.id} />
           <div className="focus-hero-gen">Gen {romanize(full.gen)}</div>
+          <RarityBadges rarities={full.rarity} />
         </div>
         <div className="focus-hero-top-right">
           <button
