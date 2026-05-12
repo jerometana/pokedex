@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import type { PokemonFull, PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
-import { stackRowVariants } from "../_lib/animations";
+import { consumeNavDir, setNavDir, stackRowVariants } from "../_lib/animations";
 import { DetailHeader } from "../_components/detail-header";
 import { DetailPanels } from "../_components/detail-panels";
 import { FocusHero } from "../_components/focus-hero";
@@ -27,6 +27,7 @@ export function DetailClient({
 }) {
   const { t, setTweak } = useTweaks();
   const router = useRouter();
+  const [dir] = useState<1 | -1 | 0>(() => consumeNavDir());
 
   const liteById = useMemo(
     () =>
@@ -63,8 +64,13 @@ export function DetailClient({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") router.push(pokemonHref(prev.id));
-      else if (e.key === "ArrowRight") router.push(pokemonHref(next.id));
+      if (e.key === "ArrowLeft") {
+        setNavDir(-1);
+        router.push(pokemonHref(prev.id));
+      } else if (e.key === "ArrowRight") {
+        setNavDir(1);
+        router.push(pokemonHref(next.id));
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -80,24 +86,25 @@ export function DetailClient({
           <motion.div
             className="stack-row"
             key={full.id}
+            custom={dir}
             variants={stackRowVariants}
             initial="enter"
             animate="center"
           >
-            <StackCard p={prev2} variant="far" />
-            <StackCard p={prev} variant="side" />
+            <StackCard p={prev2} variant="far" navDir={-1} />
+            <StackCard p={prev} variant="side" navDir={-1} />
             <AnimatePresence mode="wait" initial={false}>
               <FocusHero
                 key={full.id}
                 full={full}
                 active={active}
                 accentStrength={accentStrength}
-                dir={0}
+                dir={dir}
                 onSelectForm={setActiveFormId}
               />
             </AnimatePresence>
-            <StackCard p={next} variant="side" />
-            <StackCard p={next2} variant="far" />
+            <StackCard p={next} variant="side" navDir={1} />
+            <StackCard p={next2} variant="far" navDir={1} />
           </motion.div>
 
           <div className="detail-paginator">
@@ -105,6 +112,7 @@ export function DetailClient({
               href={pokemonHref(prev.id)}
               className="nav-btn"
               aria-label="Previous"
+              onClick={() => setNavDir(-1)}
             >
               <ChevronLeftIcon />
             </Link>
@@ -119,6 +127,7 @@ export function DetailClient({
               href={pokemonHref(next.id)}
               className="nav-btn"
               aria-label="Next"
+              onClick={() => setNavDir(1)}
             >
               <ChevronRightIcon />
             </Link>
@@ -131,7 +140,7 @@ export function DetailClient({
               active={active}
               onSelectForm={setActiveFormId}
               liteById={liteById}
-              dir={0}
+              dir={dir}
             />
           </AnimatePresence>
         </div>

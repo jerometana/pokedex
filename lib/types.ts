@@ -33,6 +33,8 @@ export const ALL_TYPES: PokeType[] = [
 
 export type Stats = { hp: number; atk: number; def: number; spA: number; spD: number; spd: number };
 
+export type LocalizedName = { lang: string; label: string; name: string };
+
 export type EvolutionNode = {
   id: number;
   children: EvolutionNode[];
@@ -91,6 +93,7 @@ export type PokemonFull = PokemonLite & {
   evolution: EvolutionNode;
   flavor: string;
   forms: PokemonForm[];
+  names: LocalizedName[];
 };
 
 export type Pokemon = PokemonFull;

@@ -97,12 +97,10 @@
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 36px; height: 36px; border-radius: 999px;
   display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line); background: var(--surface);
-  color: var(--ink-3); cursor: pointer; font-size: 20px; line-height: 1;
+  color: var(--ink-3); cursor: pointer; font-size: 64px; line-height: 1;
   z-index: 3;
-  transition: color 120ms, transform 120ms, box-shadow 120ms, background 120ms;
 }
-.form-slider-arrow:hover { color: var(--ink); box-shadow: var(--shadow-sm); }
+.form-slider-arrow:hover { color: var(--ink); }
 .form-slider-arrow-l { left: 16px; }
 .form-slider-arrow-r { right: 16px; }
 .form-slider-arrow-l:hover { transform: translateY(-50%) translateX(-2px); }
@@ -110,7 +108,12 @@
 .focus-hero-name {
   font-family: var(--font-display); font-weight: 700;
   font-size: 40px; letter-spacing: -0.02em; line-height: 1;
-  position: relative; z-index: 1;
+  position: relative; z-index: 1; margin-bottom: 8px; max-width: 80%;
+}
+.focus-hero-form-label {
+  font-family: var(--font-sans, inherit); font-weight: 600;
+  font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--ink-2); margin-bottom: 6px; line-height: 1;
 }
 .focus-hero-types { display: flex; gap: 6px; margin-top: 10px; position: relative; z-index: 1; }
 .focus-hero-flavor {

@@ -2,6 +2,16 @@ import type { Variants } from "framer-motion";
 
 export const slideEase = [0.2, 0.8, 0.2, 1] as const;
 
+let pendingNavDir: 1 | -1 | 0 = 0;
+export function setNavDir(d: 1 | -1 | 0) {
+  pendingNavDir = d;
+}
+export function consumeNavDir(): 1 | -1 | 0 {
+  const d = pendingNavDir;
+  pendingNavDir = 0;
+  return d;
+}
+
 export const heroVariants: Variants = {
   enter: (dir: number) => ({
     x: dir > 0 ? 80 : dir < 0 ? -80 : 0,

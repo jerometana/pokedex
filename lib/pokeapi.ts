@@ -3,6 +3,7 @@ import type {
   EvolutionNode,
   FormCategory,
   Gen,
+  LocalizedName,
   PokeType,
   PokemonForm,
   PokemonFull,
@@ -48,6 +49,10 @@ const PREFERRED_FLAVOR_VERSIONS = [
   "firered", "leafgreen",
 ];
 
+const LOCALIZED_LANGS: { code: string; label: string }[] = [
+  { code: "ja-roma", label: "Romaji" },
+];
+
 const TYPE_NAMES: PokeType[] = [
   "normal", "fire", "water", "electric", "grass", "ice",
   "fighting", "poison", "ground", "flying", "psychic", "bug",
@@ -72,6 +77,19 @@ function titleCase(s: string): string {
     .filter(Boolean)
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+function pickLocalizedNames(species: Pokedex.PokemonSpecies): LocalizedName[] {
+  const byLang = new Map<string, string>();
+  for (const entry of species.names) {
+    byLang.set(entry.language.name, entry.name);
+  }
+  const out: LocalizedName[] = [];
+  for (const { code, label } of LOCALIZED_LANGS) {
+    const name = byLang.get(code);
+    if (name) out.push({ lang: code, label, name });
+  }
+  return out;
 }
 
 function pickFlavor(species: Pokedex.PokemonSpecies): string {
@@ -225,6 +243,7 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     sprite: SPRITE(pkmn.id),
     forms,
     formTags,
+    names: pickLocalizedNames(species),
   };
 }
 

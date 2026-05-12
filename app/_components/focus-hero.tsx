@@ -6,7 +6,7 @@ import { useState } from "react";
 import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants, heroVariants } from "../_lib/animations";
-import { SparkleIcon } from "./icons";
+import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
 import { TypeChip } from "./type-chip";
 
@@ -35,6 +35,7 @@ export function FocusHero({
   const displayName = active.isDefault
     ? full.name
     : `${full.name} (${active.label})`;
+  const formLabel = active.isDefault ? null : active.label;
   const heroArt = shiny ? toShiny(active.art) : active.art;
   const formIdx = full.forms.findIndex((f) => f.id === active.id);
   const hasForms = full.forms.length > 1;
@@ -102,7 +103,7 @@ export function FocusHero({
           onClick={() => goForm(-1)}
           aria-label="Previous form"
         >
-          ‹
+          <ChevronLeftIcon size={64} />
         </button>
       )}
       {hasForms && (
@@ -112,7 +113,7 @@ export function FocusHero({
           onClick={() => goForm(1)}
           aria-label="Next form"
         >
-          ›
+          <ChevronRightIcon size={64} />
         </button>
       )}
 
@@ -146,7 +147,24 @@ export function FocusHero({
         </AnimatePresence>
       </div>
 
-      <div className="focus-hero-name">{displayName}</div>
+      <div className="focus-hero-name">
+        {formLabel && <div className="focus-hero-form-label">{formLabel}</div>}
+        {full.name}
+        {(() => {
+          const romaji = full.names.find((n) => n.lang === "ja-roma")?.name;
+          return romaji ? (
+            <span
+              className="block text-sm font-medium mt-3"
+              style={{
+                color: "var(--ink-3)",
+                letterSpacing: 0,
+              }}
+            >
+              ({romaji})
+            </span>
+          ) : null;
+        })()}
+      </div>
       <div className="focus-hero-types">
         {active.types.map((t) => (
           <TypeChip key={t} type={t} size="lg" />
@@ -165,7 +183,7 @@ export function FocusHero({
         </div>
         <div style={{ gridColumn: "span 2" }}>
           <div className="meta-k">Abilities</div>
-          <div className="meta-v">{active.abilities.join(" · ")}</div>
+          <div className="meta-v">{active.abilities.join(" · ") || "N/A"}</div>
         </div>
       </div>
     </motion.article>
