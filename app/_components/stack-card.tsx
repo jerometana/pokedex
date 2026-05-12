@@ -3,18 +3,15 @@
 import Link from "next/link";
 import type { PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
-import { setNavDir } from "../_lib/animations";
 import { ArtImg } from "./art-img";
 import { Num } from "./num";
 
 export function StackCard({
   p,
   variant,
-  navDir = 0,
 }: {
   p: PokemonLite;
   variant: "side" | "far";
-  navDir?: 1 | -1 | 0;
 }) {
   return (
     <Link
@@ -23,7 +20,6 @@ export function StackCard({
       className={`stack-card stack-card-${variant}`}
       aria-label={`Show ${p.name}`}
       style={{ textDecoration: "none", color: "inherit" }}
-      onClick={() => setNavDir(navDir)}
     >
       <div
         style={{

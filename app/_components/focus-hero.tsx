@@ -20,13 +20,11 @@ export function FocusHero({
   full,
   active,
   accentStrength,
-  dir,
   onSelectForm,
 }: {
   full: PokemonFull;
   active: PokemonForm;
   accentStrength: number;
-  dir: 1 | -1 | 0;
   onSelectForm: (id: number) => void;
 }) {
   const abilityDetail = full.abilityDetail;
@@ -123,7 +121,7 @@ export function FocusHero({
               inset: 0,
               filter: "drop-shadow(0 30px 40px rgba(15,23,42,0.22))",
             }}
-            custom={formDir || dir}
+            custom={formDir}
             variants={artVariants}
             initial="enter"
             animate="center"

@@ -32,20 +32,17 @@ export function DetailPanels({
   active,
   onSelectForm,
   liteById,
-  dir,
 }: {
   full: PokemonFull;
   active: PokemonForm;
   onSelectForm: (id: number) => void;
   liteById: Record<number, PokemonLite>;
-  dir: 1 | -1 | 0;
 }) {
   const tint = TYPE_COLORS[active.types[0]].chip;
   const total = Object.values(active.stats).reduce((a, b) => a + b, 0);
   const altForms = full.forms.filter((f) => !f.isDefault);
   const hasEvolution = full.evolution.children.length > 0;
 
-  void dir;
   return (
     <div className="detail-grid">
       <section className="panel panel-stats">

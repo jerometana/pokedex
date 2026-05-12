@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import type { PokemonFull, PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
-import { consumeNavDir, setNavDir, stackRowVariants } from "../_lib/animations";
 import { DetailHeader } from "../_components/detail-header";
 import { DetailPanels } from "../_components/detail-panels";
 import { FocusHero } from "../_components/focus-hero";
@@ -36,7 +34,6 @@ export function DetailClient({
 }) {
   const { t } = useTweaks();
   const router = useRouter();
-  const [dir] = useState<1 | -1 | 0>(() => consumeNavDir());
 
   const defaultForm = full.forms.find((f) => f.isDefault) ?? full.forms[0];
   const [activeFormId, setActiveFormId] = useState<number>(defaultForm.id);
@@ -58,10 +55,8 @@ export function DetailClient({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
-        setNavDir(-1);
         router.push(pokemonHref(prev.id));
       } else if (e.key === "ArrowRight") {
-        setNavDir(1);
         router.push(pokemonHref(next.id));
       }
     };
@@ -76,27 +71,19 @@ export function DetailClient({
       <DetailHeader cur={full} />
       <main className="main">
         <div className="focus-wrap">
-          <motion.div
-            className="stack-row"
-            key={full.id}
-            custom={dir}
-            variants={stackRowVariants}
-            initial="enter"
-            animate="center"
-          >
-            <StackCard p={prev2} variant="far" navDir={-1} />
-            <StackCard p={prev} variant="side" navDir={-1} />
+          <div className="stack-row">
+            <StackCard p={prev2} variant="far" />
+            <StackCard p={prev} variant="side" />
             <FocusHero
               key={full.id}
               full={full}
               active={active}
               accentStrength={accentStrength}
-              dir={dir}
               onSelectForm={handleSelectForm}
             />
-            <StackCard p={next} variant="side" navDir={1} />
-            <StackCard p={next2} variant="far" navDir={1} />
-          </motion.div>
+            <StackCard p={next} variant="side" />
+            <StackCard p={next2} variant="far" />
+          </div>
 
           <div className="detail-paginator">
             <Link
@@ -104,7 +91,6 @@ export function DetailClient({
               prefetch
               className="nav-btn"
               aria-label="Previous"
-              onClick={() => setNavDir(-1)}
             >
               <ChevronLeftIcon />
             </Link>
@@ -120,7 +106,6 @@ export function DetailClient({
               prefetch
               className="nav-btn"
               aria-label="Next"
-              onClick={() => setNavDir(1)}
             >
               <ChevronRightIcon />
             </Link>
@@ -132,7 +117,6 @@ export function DetailClient({
             active={active}
             onSelectForm={handleSelectForm}
             liteById={evoLites}
-            dir={dir}
           />
         </div>
       </main>
