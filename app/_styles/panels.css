@@ -1,6 +1,6 @@
 .detail-grid {
   display: grid; gap: 16px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
     "stats matchups"
     "moves moves"
@@ -9,7 +9,7 @@
 }
 @media (max-width: 900px) {
   .detail-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "stats"
       "matchups"
@@ -21,6 +21,7 @@
 .panel {
   background: var(--card-bg); border: 1px solid var(--line);
   border-radius: var(--radius-panel); padding: 20px 22px; box-shadow: var(--shadow-sm);
+  min-width: 0;
 }
 .panel-stats { grid-area: stats; }
 .panel-matchups { grid-area: matchups; }
@@ -263,4 +264,29 @@
 }
 :root[data-theme="dark"] .matchup-count {
   background: var(--surface);
+}
+
+@media (max-width: 720px) {
+  .detail-grid { gap: 12px; }
+  .panel { padding: 14px 14px; border-radius: 20px; }
+  .panel-h h3 { font-size: 15px; }
+  .form-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .movepool-table { font-size: 12px; }
+  .movepool-table th, .movepool-table td { padding: 6px 6px; }
+  .mp-lv { width: 32px; }
+  .mp-type, .mp-class { width: auto; }
+  .mp-num { width: 36px; }
+  .movepool-scroll { max-height: 320px; overflow-x: auto; }
+  .matchup-row { grid-template-columns: 56px 1fr; gap: 10px; padding: 6px 8px; }
+  .matchup-mult { font-size: 16px; }
+  .evo-stage { min-width: 120px; padding: 10px 12px; }
+  .evo-art { width: 80px; height: 80px; }
+  .evo-arrow { min-width: 60px; }
+  .evo-cond { max-width: 110px; }
+  .ability-tip { width: 220px; }
+}
+@media (max-width: 420px) {
+  .form-grid { grid-template-columns: repeat(auto-fill, minmax(min(110px, 44vw), 1fr)); }
+  .movepool-table .mp-class { display: none; }
+  .matchup-row { grid-template-columns: 48px 1fr; }
 }

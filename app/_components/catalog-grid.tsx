@@ -22,7 +22,8 @@ export function CatalogGrid({
 }) {
   const min = density === "compact" ? 150 : 220;
   const style: CSSProperties = {
-    gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`,
+    ["--grid-min" as string]: `${min}px`,
+    gridTemplateColumns: `repeat(auto-fill, minmax(var(--grid-min), 1fr))`,
   };
   const { count, sentinelRef } = useInfinitePage(resetKey, list.length);
   const visible = list.slice(0, count);

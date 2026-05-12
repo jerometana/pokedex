@@ -40,6 +40,7 @@
   border-radius: 14px; box-shadow: var(--shadow-lg);
   overflow: hidden; padding: 6px;
   transform-origin: top left;
+  max-width: calc(100vw - 24px);
 }
 .filter-bar-bottom .dd-menu {
   top: auto; bottom: calc(100% + 6px);
@@ -112,4 +113,10 @@
 
 @media (max-width: 720px) {
   .dd-chips { max-width: 160px; overflow: hidden; }
+  .dd-trigger { min-height: 36px; padding: 6px 10px 6px 12px; }
+  .dd-label { font-size: 10.5px; }
+  .dd-menu-list { max-height: 50vh; }
+}
+@media (max-width: 420px) {
+  .dd-chips { max-width: 110px; }
 }

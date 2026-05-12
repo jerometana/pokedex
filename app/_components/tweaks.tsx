@@ -110,6 +110,12 @@ export function TweaksPanel({
   setTweak: <K extends keyof Tweaks>(k: K, v: Tweaks[K]) => void;
 }) {
   const [open, setOpen] = useState(true);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth <= 720) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOpen(false);
+    }
+  }, []);
   if (!open) {
     return (
       <button

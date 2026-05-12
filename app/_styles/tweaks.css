@@ -61,3 +61,10 @@
   border-radius: 6px; color: var(--ink-2); font-size: 13px; line-height: 1;
 }
 .tweaks-toggle:hover { background: var(--line); color: var(--ink); }
+
+@media (max-width: 720px) {
+  .tweaks-panel {
+    right: 12px; bottom: 12px;
+    width: min(264px, calc(100vw - 24px));
+  }
+}
