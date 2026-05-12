@@ -34,7 +34,6 @@ export function CatalogGrid({
           <Link
             key={p.id}
             href={pokemonHref(p.id)}
-            prefetch={false}
             className="grid-card"
             style={{ textDecoration: "none", color: "inherit" }}
           >

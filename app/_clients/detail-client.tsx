@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,54 +14,46 @@ import { ChevronLeftIcon, ChevronRightIcon } from "../_components/icons";
 import { StackCard } from "../_components/stack-card";
 import { accentStrengthFor, useTweaks } from "../_components/tweaks";
 
+type Neighbors = {
+  prev2: PokemonLite;
+  prev: PokemonLite;
+  next: PokemonLite;
+  next2: PokemonLite;
+};
+
 export function DetailClient({
-  pokemon,
   full,
+  neighbors,
+  idx,
+  total,
+  evoLites,
 }: {
-  pokemon: PokemonLite[];
   full: PokemonFull;
+  neighbors: Neighbors;
+  idx: number;
+  total: number;
+  evoLites: Record<number, PokemonLite>;
 }) {
   const { t } = useTweaks();
   const router = useRouter();
   const [dir] = useState<1 | -1 | 0>(() => consumeNavDir());
 
-  const liteById = useMemo(
-    () =>
-      Object.fromEntries(pokemon.map((p) => [p.id, p])) as Record<
-        number,
-        PokemonLite
-      >,
-    [pokemon],
-  );
-
-  const defaultForm = useMemo(
-    () => full.forms.find((f) => f.isDefault) ?? full.forms[0],
-    [full.forms],
-  );
+  const defaultForm = full.forms.find((f) => f.isDefault) ?? full.forms[0];
   const [activeFormId, setActiveFormId] = useState<number>(defaultForm.id);
   const [prevDefaultId, setPrevDefaultId] = useState(defaultForm.id);
   if (prevDefaultId !== defaultForm.id) {
     setPrevDefaultId(defaultForm.id);
     setActiveFormId(defaultForm.id);
   }
-  const active = useMemo(
-    () => full.forms.find((f) => f.id === activeFormId) ?? defaultForm,
-    [full.forms, activeFormId, defaultForm],
-  );
+  const active =
+    full.forms.find((f) => f.id === activeFormId) ?? defaultForm;
 
   const handleSelectForm = (id: number) => {
     setActiveFormId(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const idx = Math.max(
-    0,
-    pokemon.findIndex((p) => p.id === full.id),
-  );
-  const prev = pokemon[(idx - 1 + pokemon.length) % pokemon.length];
-  const next = pokemon[(idx + 1) % pokemon.length];
-  const prev2 = pokemon[(idx - 2 + pokemon.length) % pokemon.length];
-  const next2 = pokemon[(idx + 2) % pokemon.length];
+  const { prev2, prev, next, next2 } = neighbors;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -123,7 +115,7 @@ export function DetailClient({
                 {idx + 1}
               </span>
               <span style={{ color: "#CBD5E1" }}>/</span>
-              <span style={{ color: "#94A3B8" }}>{pokemon.length}</span>
+              <span style={{ color: "#94A3B8" }}>{total}</span>
             </div>
             <Link
               href={pokemonHref(next.id)}
@@ -142,7 +134,7 @@ export function DetailClient({
               full={full}
               active={active}
               onSelectForm={handleSelectForm}
-              liteById={liteById}
+              liteById={evoLites}
               dir={dir}
             />
           </AnimatePresence>
