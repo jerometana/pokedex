@@ -1,8 +1,21 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { DetailClient } from "@/app/_clients/detail-client";
 import { getAllPokemonLite, getFullPokemon } from "@/lib/pokeapi";
 
-export default async function Page({
+export default function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <PokemonDetail params={params} />
+    </Suspense>
+  );
+}
+
+async function PokemonDetail({
   params,
 }: {
   params: Promise<{ id: string }>;

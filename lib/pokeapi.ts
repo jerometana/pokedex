@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 import Pokedex from "pokedex-promise-v2";
 import { rarityFor } from "./rarity";
 import type {
@@ -425,8 +425,10 @@ async function getDamageRelations(): Promise<DamageRelations> {
   return DAMAGE_RELATIONS_PROMISE;
 }
 
-export const getFullPokemon = cache(_getFullPokemon);
-async function _getFullPokemon(id: number): Promise<PokemonFull> {
+export async function getFullPokemon(id: number): Promise<PokemonFull> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(`pokemon:${id}`);
   const [pkmn, species, damageRelations] = await Promise.all([
     P.getPokemonByName(id),
     P.getPokemonSpeciesByName(id),
@@ -512,8 +514,10 @@ function deriveFormTags(speciesSlug: string, formSlugs: string[]): FormCategory[
   return Array.from(set);
 }
 
-export const getAllPokemonLite = cache(_getAllPokemonLite);
-async function _getAllPokemonLite(): Promise<PokemonLite[]> {
+export async function getAllPokemonLite(): Promise<PokemonLite[]> {
+  "use cache";
+  cacheLife("max");
+  cacheTag("pokemon:list");
   const typeResults = await P.getTypeByName(TYPE_NAMES as unknown as string[]);
   const typesByPokemonId = new Map<number, PokeType[]>();
   for (const t of typeResults) {
