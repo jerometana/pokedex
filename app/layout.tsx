@@ -25,13 +25,20 @@ export const metadata: Metadata = {
   description: "Modern, white, rounded, polished Pokédex.",
 };
 
+const THEME_INIT = `(function(){try{var s=localStorage.getItem("pokedex.tweaks");if(!s)return;var t=JSON.parse(s);var r=document.documentElement;if(t.mode==="dark"||t.mode==="light")r.dataset.theme=t.mode;if(typeof t.typeScale==="number")r.style.setProperty("--type-scale",String(t.typeScale/100));}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      className={`${bricolage.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        <link rel="preconnect" href="https://raw.githubusercontent.com" crossOrigin="" />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <link rel="preconnect" href="https://raw.githubusercontent.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
       </head>
       <body>{children}</body>

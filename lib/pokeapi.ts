@@ -1,3 +1,4 @@
+import { cache } from "react";
 import Pokedex from "pokedex-promise-v2";
 import { rarityFor } from "./rarity";
 import type {
@@ -274,7 +275,8 @@ async function buildForm(
       },
       raw: pkmn,
     };
-  } catch {
+  } catch (err) {
+    console.error(`[pokeapi] buildForm failed for ${variety.pokemon.name}:`, err);
     return null;
   }
 }
@@ -423,7 +425,8 @@ async function getDamageRelations(): Promise<DamageRelations> {
   return DAMAGE_RELATIONS_PROMISE;
 }
 
-export async function getFullPokemon(id: number): Promise<PokemonFull> {
+export const getFullPokemon = cache(_getFullPokemon);
+async function _getFullPokemon(id: number): Promise<PokemonFull> {
   const [pkmn, species, damageRelations] = await Promise.all([
     P.getPokemonByName(id),
     P.getPokemonSpeciesByName(id),
@@ -509,7 +512,8 @@ function deriveFormTags(speciesSlug: string, formSlugs: string[]): FormCategory[
   return Array.from(set);
 }
 
-export async function getAllPokemonLite(): Promise<PokemonLite[]> {
+export const getAllPokemonLite = cache(_getAllPokemonLite);
+async function _getAllPokemonLite(): Promise<PokemonLite[]> {
   const typeResults = await P.getTypeByName(TYPE_NAMES as unknown as string[]);
   const typesByPokemonId = new Map<number, PokeType[]>();
   TYPE_NAMES.forEach((tname, ti) => {
@@ -534,7 +538,7 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
     }
   });
 
-  const fullList = await P.getPokemonsList({ offset: 0, limit: 20000 });
+  const fullList = await P.getPokemonsList({ offset: 0, limit: 2000 });
 
   const baseEntries: { id: number; name: string }[] = [];
   const formEntries: { id: number; name: string }[] = [];
