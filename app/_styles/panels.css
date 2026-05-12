@@ -2,8 +2,8 @@
   display: grid; gap: 16px;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
-    "stats matchups"
-    "moves moves"
+    "stats moves"
+    "matchups moves"
     "evo evo"
     "forms forms";
 }
@@ -104,13 +104,13 @@
   border-radius: 20px; padding: 14px 18px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   cursor: pointer; min-width: 140px;
-  max-height: 260px;
+  max-height: 480px;
   flex: 1 1 0;
   transition: transform 160ms, box-shadow 160ms, border-color 160ms;
 }
 .evo-stage:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .evo-stage.active { border-color: var(--ink); box-shadow: var(--shadow-md); }
-.evo-art { width: 96px; height: 96px; display: grid; place-items: center; }
+.evo-art { width: 200px; height: 200px; display: grid; place-items: center; padding: 24px; }
 .evo-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.12)); }
 .evo-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
 .evo-types { display: flex; gap: 4px; margin-top: 4px; }

@@ -111,6 +111,7 @@ export function DetailClient({
           <div className="detail-paginator">
             <Link
               href={pokemonHref(prev.id)}
+              prefetch
               className="nav-btn"
               aria-label="Previous"
               onClick={() => setNavDir(-1)}
@@ -126,6 +127,7 @@ export function DetailClient({
             </div>
             <Link
               href={pokemonHref(next.id)}
+              prefetch
               className="nav-btn"
               aria-label="Next"
               onClick={() => setNavDir(1)}

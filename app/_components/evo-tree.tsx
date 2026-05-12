@@ -35,7 +35,9 @@ function describeCondition(c: EvoCondition): string[] {
     if (c.minLevel != null) parts.push(`Lv. ${c.minLevel}`);
     else parts.push("Level up");
   } else if (c.trigger === "trade") {
-    parts.push(c.tradeSpecies ? `Trade w/ ${titleize(c.tradeSpecies)}` : "Trade");
+    parts.push(
+      c.tradeSpecies ? `Trade w/ ${titleize(c.tradeSpecies)}` : "Trade",
+    );
   } else if (c.trigger === "use-item") {
     parts.push(c.item ? `Use ${titleize(c.item)}` : "Use item");
   } else if (c.trigger === "shed") {
@@ -62,7 +64,8 @@ function describeCondition(c: EvoCondition): string[] {
   if (c.heldItem) parts.push(`Hold ${titleize(c.heldItem)}`);
   if (c.knownMove) parts.push(`Know ${titleize(c.knownMove)}`);
   if (c.knownMoveType) parts.push(`Know ${titleize(c.knownMoveType)} move`);
-  if (c.usedMove && c.trigger !== "use-item") parts.push(`Use ${titleize(c.usedMove)}`);
+  if (c.usedMove && c.trigger !== "use-item")
+    parts.push(`Use ${titleize(c.usedMove)}`);
   if (c.minHappiness != null) parts.push(`Happiness ≥ ${c.minHappiness}`);
   if (c.minBeauty != null) parts.push(`Beauty ≥ ${c.minBeauty}`);
   if (c.minAffection != null) parts.push(`Affection ≥ ${c.minAffection}`);
@@ -111,9 +114,9 @@ function EvoStage({ ev, active }: { ev: PokemonLite; active: boolean }) {
         <Image
           src={ev.art}
           alt={ev.name}
-          width={96}
-          height={96}
-          sizes="96px"
+          width={200}
+          height={200}
+          sizes="200px"
           quality={50}
           style={{ objectFit: "contain" }}
         />
@@ -152,11 +155,7 @@ export function EvoTree({
       <div className="evo-row">
         {stage}
         <EvoArrow conditions={child.conditions} />
-        <EvoTree
-          node={child}
-          liteById={liteById}
-          currentId={currentId}
-        />
+        <EvoTree node={child} liteById={liteById} currentId={currentId} />
       </div>
     );
   }
@@ -168,11 +167,7 @@ export function EvoTree({
         {node.children.map((child) => (
           <div key={child.id} className="evo-branch-row">
             <EvoArrow conditions={child.conditions} />
-            <EvoTree
-              node={child}
-              liteById={liteById}
-              currentId={currentId}
-            />
+            <EvoTree node={child} liteById={liteById} currentId={currentId} />
           </div>
         ))}
       </div>

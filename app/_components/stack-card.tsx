@@ -19,6 +19,7 @@ export function StackCard({
   return (
     <Link
       href={pokemonHref(p.id)}
+      prefetch
       className={`stack-card stack-card-${variant}`}
       aria-label={`Show ${p.name}`}
       style={{ textDecoration: "none", color: "inherit" }}

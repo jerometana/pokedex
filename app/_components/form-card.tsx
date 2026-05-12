@@ -26,9 +26,9 @@ export function FormCard({
         <Image
           src={form.art}
           alt={display}
-          width={96}
-          height={96}
-          sizes="96px"
+          width={200}
+          height={200}
+          sizes="200px"
           quality={50}
           style={{ objectFit: "contain" }}
         />
