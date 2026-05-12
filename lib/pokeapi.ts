@@ -1,16 +1,26 @@
 import Pokedex from "pokedex-promise-v2";
 import { rarityFor } from "./rarity";
 import type {
+  Ability,
+  AbilityDetail,
+  DamageClass,
+  DamageRelations,
+  EvoCondition,
   EvolutionNode,
   FormCategory,
   Gen,
+  LearnMethod,
   LocalizedName,
+  MoveDetail,
+  MoveEntry,
   PokeType,
   PokemonForm,
   PokemonFull,
   PokemonLite,
   Stats,
+  TypeRelation,
 } from "./types";
+import { ALL_TYPES } from "./types";
 
 const REVALIDATE_SECONDS = 60 * 60 * 24 * 30;
 const MAX_ID = 1025;
@@ -50,6 +60,27 @@ const PREFERRED_FLAVOR_VERSIONS = [
   "firered", "leafgreen",
 ];
 
+const PREFERRED_VERSION_GROUPS = [
+  "scarlet-violet",
+  "sword-shield",
+  "ultra-sun-ultra-moon",
+  "sun-moon",
+  "omega-ruby-alpha-sapphire",
+  "x-y",
+  "black-2-white-2",
+  "black-white",
+  "heartgold-soulsilver",
+  "platinum",
+  "diamond-pearl",
+  "firered-leafgreen",
+  "emerald",
+  "ruby-sapphire",
+  "crystal",
+  "gold-silver",
+  "yellow",
+  "red-blue",
+];
+
 const LOCALIZED_LANGS: { code: string; label: string }[] = [
   { code: "ja-roma", label: "Romaji" },
 ];
@@ -65,10 +96,46 @@ function urlToId(url: string): number {
   return Number(parts[parts.length - 1]);
 }
 
-function buildEvoTree(link: { species: { url: string }; evolves_to: unknown[] }): EvolutionNode {
+function namedSlug(r: { name: string } | null | undefined): string | null {
+  return r?.name ?? null;
+}
+
+function mapEvoDetail(d: Pokedex.EvolutionDetail): EvoCondition {
+  return {
+    trigger: d.trigger?.name ?? "unknown",
+    minLevel: d.min_level ?? null,
+    item: namedSlug(d.item),
+    heldItem: namedSlug(d.held_item),
+    timeOfDay: d.time_of_day ?? "",
+    location: namedSlug(d.location),
+    knownMove: namedSlug(d.known_move),
+    knownMoveType: namedSlug(d.known_move_type),
+    usedMove: namedSlug(d.used_move),
+    minHappiness: d.min_happiness ?? null,
+    minBeauty: d.min_beauty ?? null,
+    minAffection: d.min_affection ?? null,
+    gender: d.gender ?? null,
+    needsOverworldRain: !!d.needs_overworld_rain,
+    needsMultiplayer: !!d.needs_multiplayer,
+    turnUpsideDown: !!d.turn_upside_down,
+    relativePhysicalStats: d.relative_physical_stats ?? null,
+    tradeSpecies: namedSlug(d.trade_species),
+    partySpecies: namedSlug(d.party_species),
+    partyType: namedSlug(d.party_type),
+  };
+}
+
+type EvoLink = {
+  species: { url: string };
+  evolution_details: Pokedex.EvolutionDetail[];
+  evolves_to: EvoLink[];
+};
+
+function buildEvoTree(link: EvoLink): EvolutionNode {
   return {
     id: urlToId(link.species.url),
-    children: (link.evolves_to as typeof link[]).map(buildEvoTree),
+    conditions: (link.evolution_details ?? []).map(mapEvoDetail),
+    children: (link.evolves_to ?? []).map(buildEvoTree),
   };
 }
 
@@ -158,10 +225,27 @@ function formLabel(speciesSlug: string, formSlug: string, isDefault: boolean): s
   return FORM_LABEL_MAP[suffix] ?? titleCase(suffix);
 }
 
+function buildFormAbilities(pkmn: Pokedex.Pokemon): Ability[] {
+  const ordered = [...pkmn.abilities].sort((a, b) => a.slot - b.slot);
+  const seen = new Set<string>();
+  const out: Ability[] = [];
+  for (const a of ordered) {
+    const slug = a.ability.name;
+    if (seen.has(slug)) continue;
+    seen.add(slug);
+    out.push({
+      slug,
+      name: titleCase(slug),
+      isHidden: !!a.is_hidden,
+    });
+  }
+  return out;
+}
+
 async function buildForm(
   variety: { pokemon: { name: string; url: string }; is_default: boolean },
   speciesSlug: string,
-): Promise<PokemonForm | null> {
+): Promise<{ form: PokemonForm; raw: Pokedex.Pokemon } | null> {
   try {
     const pkmn = await P.getPokemonByName(variety.pokemon.name);
     const types = [...pkmn.types]
@@ -174,33 +258,176 @@ async function buildForm(
       if (k) stats[k] = s.base_stat;
     }
 
-    const abilitiesOrdered = [...pkmn.abilities].sort((a, b) => a.slot - b.slot);
-    const abilities = Array.from(
-      new Set(abilitiesOrdered.map((a) => titleCase(a.ability.name))),
-    );
-
     return {
-      id: pkmn.id,
-      slug: pkmn.name,
-      label: formLabel(speciesSlug, pkmn.name, variety.is_default),
-      isDefault: variety.is_default,
-      types,
-      height: Math.round((pkmn.height / 10) * 10) / 10,
-      weight: Math.round((pkmn.weight / 10) * 10) / 10,
-      abilities,
-      stats,
-      art: ART(pkmn.id),
-      sprite: SPRITE(pkmn.id),
+      form: {
+        id: pkmn.id,
+        slug: pkmn.name,
+        label: formLabel(speciesSlug, pkmn.name, variety.is_default),
+        isDefault: variety.is_default,
+        types,
+        height: Math.round((pkmn.height / 10) * 10) / 10,
+        weight: Math.round((pkmn.weight / 10) * 10) / 10,
+        abilities: buildFormAbilities(pkmn),
+        stats,
+        art: ART(pkmn.id),
+        sprite: SPRITE(pkmn.id),
+      },
+      raw: pkmn,
     };
   } catch {
     return null;
   }
 }
 
+function pickBestVersionGroup(pkmn: Pokedex.Pokemon): string | null {
+  const present = new Set<string>();
+  for (const m of pkmn.moves) {
+    for (const d of m.version_group_details) present.add(d.version_group.name);
+  }
+  for (const vg of PREFERRED_VERSION_GROUPS) {
+    if (present.has(vg)) return vg;
+  }
+  return present.values().next().value ?? null;
+}
+
+function mapLearnMethod(raw: string): LearnMethod {
+  if (raw === "level-up" || raw === "machine" || raw === "egg" || raw === "tutor") return raw;
+  return "other";
+}
+
+function buildMovepool(pkmn: Pokedex.Pokemon, vg: string | null): MoveEntry[] {
+  if (!vg) return [];
+  const out: MoveEntry[] = [];
+  const seen = new Map<string, MoveEntry>();
+  for (const m of pkmn.moves) {
+    const entries = m.version_group_details.filter(
+      (d) => d.version_group.name === vg,
+    );
+    if (entries.length === 0) continue;
+    for (const d of entries) {
+      const lm = mapLearnMethod(d.move_learn_method.name);
+      const key = `${m.move.name}::${lm}`;
+      const prev = seen.get(key);
+      const level = d.level_learned_at || 0;
+      if (prev) {
+        if (level && (!prev.level || level < prev.level)) prev.level = level;
+        continue;
+      }
+      const entry: MoveEntry = {
+        slug: m.move.name,
+        name: titleCase(m.move.name),
+        learnMethod: lm,
+        level,
+      };
+      seen.set(key, entry);
+      out.push(entry);
+    }
+  }
+  out.sort((a, b) => {
+    if (a.learnMethod !== b.learnMethod) return a.learnMethod.localeCompare(b.learnMethod);
+    if (a.learnMethod === "level-up") return (a.level || 0) - (b.level || 0);
+    return a.name.localeCompare(b.name);
+  });
+  return out;
+}
+
+function pickAbilityShortEffect(a: Pokedex.Ability): string {
+  return cleanText(
+    a.effect_entries.find((e) => e.language.name === "en")?.short_effect ?? "",
+  );
+}
+function pickAbilityEffect(a: Pokedex.Ability): string {
+  return cleanText(
+    a.effect_entries.find((e) => e.language.name === "en")?.effect ?? "",
+  );
+}
+function pickAbilityFlavor(a: Pokedex.Ability): string {
+  const en = a.flavor_text_entries.filter((e) => e.language.name === "en");
+  for (const vg of PREFERRED_VERSION_GROUPS) {
+    const hit = en.find((e) => e.version_group.name === vg);
+    if (hit) return cleanText(hit.flavor_text);
+  }
+  return cleanText(en[0]?.flavor_text ?? "");
+}
+
+function pickMoveEffect(m: Pokedex.Move, short: boolean): string {
+  const entry = m.effect_entries.find((e) => e.language.name === "en");
+  if (!entry) return "";
+  const raw = short ? entry.short_effect : entry.effect;
+  const chance = m.effect_chance ?? "";
+  return cleanText(raw.replace(/\$effect_chance/g, String(chance)));
+}
+
+function cleanText(s: string): string {
+  return s.replace(/[\f\n\r­]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+async function fetchAbilityDetails(slugs: string[]): Promise<Record<string, AbilityDetail>> {
+  if (slugs.length === 0) return {};
+  const list = await P.getAbilityByName(slugs);
+  const arr = Array.isArray(list) ? list : [list];
+  const out: Record<string, AbilityDetail> = {};
+  for (const a of arr) {
+    out[a.name] = {
+      shortEffect: pickAbilityShortEffect(a),
+      effect: pickAbilityEffect(a),
+      flavor: pickAbilityFlavor(a),
+    };
+  }
+  return out;
+}
+
+async function fetchMoveDetails(slugs: string[]): Promise<Record<string, MoveDetail>> {
+  if (slugs.length === 0) return {};
+  const list = await P.getMoveByName(slugs);
+  const arr = Array.isArray(list) ? list : [list];
+  const out: Record<string, MoveDetail> = {};
+  for (const m of arr) {
+    out[m.name] = {
+      slug: m.name,
+      name: titleCase(m.name),
+      type: m.type.name as PokeType,
+      damageClass: m.damage_class.name as DamageClass,
+      power: m.power,
+      accuracy: m.accuracy,
+      pp: m.pp,
+      shortEffect: pickMoveEffect(m, true),
+      effect: pickMoveEffect(m, false),
+    };
+  }
+  return out;
+}
+
+let DAMAGE_RELATIONS_PROMISE: Promise<DamageRelations> | null = null;
+async function getDamageRelations(): Promise<DamageRelations> {
+  if (!DAMAGE_RELATIONS_PROMISE) {
+    DAMAGE_RELATIONS_PROMISE = (async () => {
+      const list = await P.getTypeByName(ALL_TYPES as unknown as string[]);
+      const arr = Array.isArray(list) ? list : [list];
+      const out = {} as DamageRelations;
+      for (const t of arr) {
+        const r = t.damage_relations;
+        const rel: TypeRelation = {
+          doubleFrom: r.double_damage_from.map((x) => x.name as PokeType),
+          halfFrom: r.half_damage_from.map((x) => x.name as PokeType),
+          noFrom: r.no_damage_from.map((x) => x.name as PokeType),
+          doubleTo: r.double_damage_to.map((x) => x.name as PokeType),
+          halfTo: r.half_damage_to.map((x) => x.name as PokeType),
+          noTo: r.no_damage_to.map((x) => x.name as PokeType),
+        };
+        out[t.name as PokeType] = rel;
+      }
+      return out;
+    })();
+  }
+  return DAMAGE_RELATIONS_PROMISE;
+}
+
 export async function getFullPokemon(id: number): Promise<PokemonFull> {
-  const [pkmn, species] = await Promise.all([
+  const [pkmn, species, damageRelations] = await Promise.all([
     P.getPokemonByName(id),
     P.getPokemonSpeciesByName(id),
+    getDamageRelations(),
   ]);
   const chainId = urlToId(species.evolution_chain.url);
   const chain = await P.getEvolutionChainById(chainId);
@@ -215,17 +442,32 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     if (k) stats[k] = s.base_stat;
   }
 
-  const abilitiesOrdered = [...pkmn.abilities].sort((a, b) => a.slot - b.slot);
-  const abilities = Array.from(
-    new Set(abilitiesOrdered.map((a) => titleCase(a.ability.name))),
-  );
-
   const formsRaw = await Promise.all(
     species.varieties.map((v) => buildForm(v, species.name)),
   );
-  const forms = formsRaw.filter((f): f is PokemonForm => f !== null);
-  forms.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+  const formBundles = formsRaw.filter(
+    (f): f is { form: PokemonForm; raw: Pokedex.Pokemon } => f !== null,
+  );
+  formBundles.sort((a, b) => Number(b.form.isDefault) - Number(a.form.isDefault));
 
+  const forms = formBundles.map((b) => b.form);
+  const defaultBundle = formBundles.find((b) => b.form.isDefault) ?? formBundles[0];
+  const defaultRaw = defaultBundle?.raw ?? pkmn;
+
+  const versionGroup = pickBestVersionGroup(defaultRaw);
+  const movepool = buildMovepool(defaultRaw, versionGroup);
+
+  const abilitySlugs = Array.from(
+    new Set(forms.flatMap((f) => f.abilities.map((a) => a.slug))),
+  );
+  const moveSlugs = Array.from(new Set(movepool.map((m) => m.slug)));
+
+  const [abilityDetail, moveDetail] = await Promise.all([
+    fetchAbilityDetails(abilitySlugs),
+    fetchMoveDetails(moveSlugs),
+  ]);
+
+  const defaultAbilities = defaultBundle?.form.abilities ?? buildFormAbilities(pkmn);
   const formTags = deriveFormTags(species.name, forms.map((f) => f.slug));
 
   return {
@@ -235,17 +477,22 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     types,
     height: Math.round((pkmn.height / 10) * 10) / 10,
     weight: Math.round((pkmn.weight / 10) * 10) / 10,
-    abilities,
+    abilities: defaultAbilities,
     stats,
-    moves: pkmn.moves.slice(0, 8).map((m) => titleCase(m.move.name)),
-    evolution: buildEvoTree(chain.chain),
-    flavor: pickFlavor(species).replace(/[\f\n\r­]/g, " ").replace(/\s+/g, " ").trim(),
+    movepool,
+    moveDetail,
+    abilityDetail,
+    evolution: buildEvoTree(chain.chain as EvoLink),
+    babyTriggerItem: chain.baby_trigger_item?.name ?? null,
+    flavor: cleanText(pickFlavor(species)),
     art: ART(pkmn.id),
     sprite: SPRITE(pkmn.id),
     forms,
     formTags,
     rarity: rarityFor(pkmn.id),
     names: pickLocalizedNames(species),
+    damageRelations,
+    versionGroup,
   };
 }
 

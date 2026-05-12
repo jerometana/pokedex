@@ -6,7 +6,7 @@ export function DetailHeader({ cur }: { cur: PokemonLite }) {
   return (
     <header className="filter-bar">
       <div className="filter-bar-inner">
-        <Brand subtitle="Back to catalog" />
+        <Brand subtitle="By Jerome Tana" />
       </div>
       <div className="pills-row">
         <div className="pills-scroll">

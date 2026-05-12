@@ -12,11 +12,7 @@ import { DetailPanels } from "../_components/detail-panels";
 import { FocusHero } from "../_components/focus-hero";
 import { ChevronLeftIcon, ChevronRightIcon } from "../_components/icons";
 import { StackCard } from "../_components/stack-card";
-import {
-  accentStrengthFor,
-  TweaksPanel,
-  useTweaks,
-} from "../_components/tweaks";
+import { accentStrengthFor, useTweaks } from "../_components/tweaks";
 
 export function DetailClient({
   pokemon,
@@ -25,7 +21,7 @@ export function DetailClient({
   pokemon: PokemonLite[];
   full: PokemonFull;
 }) {
-  const { t, setTweak } = useTweaks();
+  const { t } = useTweaks();
   const router = useRouter();
   const [dir] = useState<1 | -1 | 0>(() => consumeNavDir());
 
@@ -145,7 +141,6 @@ export function DetailClient({
           </AnimatePresence>
         </div>
       </main>
-      <TweaksPanel t={t} setTweak={setTweak} />
     </div>
   );
 }

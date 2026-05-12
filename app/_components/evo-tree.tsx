@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { EvolutionNode, PokemonLite } from "@/lib/types";
+import type { EvoCondition, EvolutionNode, PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
 import { ArrowRightIcon } from "./icons";
 import { Num } from "./num";
@@ -21,10 +21,80 @@ export function evoLabel(n: EvolutionNode): string {
   return `${total} stages`;
 }
 
-function EvoArrow() {
+function titleize(s: string): string {
+  return s
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function describeCondition(c: EvoCondition): string[] {
+  const parts: string[] = [];
+  if (c.trigger === "level-up") {
+    if (c.minLevel != null) parts.push(`Lv. ${c.minLevel}`);
+    else parts.push("Level up");
+  } else if (c.trigger === "trade") {
+    parts.push(c.tradeSpecies ? `Trade w/ ${titleize(c.tradeSpecies)}` : "Trade");
+  } else if (c.trigger === "use-item") {
+    parts.push(c.item ? `Use ${titleize(c.item)}` : "Use item");
+  } else if (c.trigger === "shed") {
+    parts.push("Shed");
+  } else if (c.trigger === "spin") {
+    parts.push("Spin");
+  } else if (c.trigger === "tower-of-darkness") {
+    parts.push("Tower of Darkness");
+  } else if (c.trigger === "tower-of-waters") {
+    parts.push("Tower of Waters");
+  } else if (c.trigger === "three-critical-hits") {
+    parts.push("3 critical hits in 1 battle");
+  } else if (c.trigger === "take-damage") {
+    parts.push("Take damage");
+  } else if (c.trigger === "agile-style-move") {
+    parts.push("Use agile-style move");
+  } else if (c.trigger === "strong-style-move") {
+    parts.push("Use strong-style move");
+  } else if (c.trigger === "recoil-damage") {
+    parts.push("Recoil damage");
+  } else {
+    parts.push(titleize(c.trigger));
+  }
+  if (c.heldItem) parts.push(`Hold ${titleize(c.heldItem)}`);
+  if (c.knownMove) parts.push(`Know ${titleize(c.knownMove)}`);
+  if (c.knownMoveType) parts.push(`Know ${titleize(c.knownMoveType)} move`);
+  if (c.usedMove && c.trigger !== "use-item") parts.push(`Use ${titleize(c.usedMove)}`);
+  if (c.minHappiness != null) parts.push(`Happiness ≥ ${c.minHappiness}`);
+  if (c.minBeauty != null) parts.push(`Beauty ≥ ${c.minBeauty}`);
+  if (c.minAffection != null) parts.push(`Affection ≥ ${c.minAffection}`);
+  if (c.timeOfDay) parts.push(titleize(c.timeOfDay));
+  if (c.location) parts.push(`At ${titleize(c.location)}`);
+  if (c.needsOverworldRain) parts.push("Raining");
+  if (c.needsMultiplayer) parts.push("Multiplayer");
+  if (c.turnUpsideDown) parts.push("Hold upside down");
+  if (c.gender === 1) parts.push("Female");
+  else if (c.gender === 2) parts.push("Male");
+  if (c.relativePhysicalStats === 1) parts.push("Atk > Def");
+  else if (c.relativePhysicalStats === -1) parts.push("Atk < Def");
+  else if (c.relativePhysicalStats === 0) parts.push("Atk = Def");
+  if (c.partySpecies) parts.push(`Party has ${titleize(c.partySpecies)}`);
+  if (c.partyType) parts.push(`Party has ${titleize(c.partyType)} type`);
+  return parts;
+}
+
+function EvoArrow({ conditions }: { conditions: EvoCondition[] }) {
+  const labels = conditions.flatMap(describeCondition);
   return (
-    <div className="evo-arrow" aria-hidden>
+    <div className="evo-arrow" aria-label={labels.join("; ") || "evolves"}>
       <ArrowRightIcon />
+      {labels.length > 0 && (
+        <div className="evo-cond">
+          {Array.from(new Set(labels)).map((l) => (
+            <span key={l} className="evo-cond-pill">
+              {l}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -77,12 +147,13 @@ export function EvoTree({
   }
 
   if (node.children.length === 1) {
+    const child = node.children[0];
     return (
       <div className="evo-row">
         {stage}
-        <EvoArrow />
+        <EvoArrow conditions={child.conditions} />
         <EvoTree
-          node={node.children[0]}
+          node={child}
           liteById={liteById}
           currentId={currentId}
         />
@@ -93,15 +164,16 @@ export function EvoTree({
   return (
     <div className="evo-row">
       {stage}
-      <EvoArrow />
       <div className="evo-branches">
         {node.children.map((child) => (
-          <EvoTree
-            key={child.id}
-            node={child}
-            liteById={liteById}
-            currentId={currentId}
-          />
+          <div key={child.id} className="evo-branch-row">
+            <EvoArrow conditions={child.conditions} />
+            <EvoTree
+              node={child}
+              liteById={liteById}
+              currentId={currentId}
+            />
+          </div>
         ))}
       </div>
     </div>

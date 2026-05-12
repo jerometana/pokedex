@@ -16,7 +16,7 @@ import {
 import { CatalogGrid } from "../_components/catalog-grid";
 import { Empty } from "../_components/empty";
 import { FilterBar } from "../_components/filter-bar";
-import { TweaksPanel, useTweaks } from "../_components/tweaks";
+import { useTweaks } from "../_components/tweaks";
 
 const Q_KEY = "q";
 const GENS_KEY = "gens";
@@ -61,7 +61,7 @@ function parseRarities(raw: string | null): Set<Rarity> {
 }
 
 export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
-  const { t, setTweak } = useTweaks();
+  const { t } = useTweaks();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -230,7 +230,6 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
           />
         )}
       </main>
-      <TweaksPanel t={t} setTweak={setTweak} />
     </div>
   );
 }

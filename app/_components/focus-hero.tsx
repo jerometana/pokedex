@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants, heroVariants } from "../_lib/animations";
+import { AbilityChip } from "./ability-chip";
 import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
 import { RarityBadges } from "./rarity-badge";
@@ -28,6 +29,7 @@ export function FocusHero({
   dir: 1 | -1 | 0;
   onSelectForm: (id: number) => void;
 }) {
+  const abilityDetail = full.abilityDetail;
   const [shiny, setShiny] = useState(false);
   const primary = TYPE_COLORS[active.types[0]];
   const tintBg = accentStrength
@@ -185,7 +187,18 @@ export function FocusHero({
         </div>
         <div style={{ gridColumn: "span 2" }}>
           <div className="meta-k">Abilities</div>
-          <div className="meta-v">{active.abilities.join(" · ") || "N/A"}</div>
+          <div className="ability-chip-row">
+            {active.abilities.length === 0 && (
+              <span className="meta-v">N/A</span>
+            )}
+            {active.abilities.map((a) => (
+              <AbilityChip
+                key={a.slug}
+                ability={a}
+                detail={abilityDetail[a.slug]}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </motion.article>

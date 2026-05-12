@@ -35,10 +35,102 @@ export type Stats = { hp: number; atk: number; def: number; spA: number; spD: nu
 
 export type LocalizedName = { lang: string; label: string; name: string };
 
+export type Ability = {
+  slug: string;
+  name: string;
+  isHidden: boolean;
+};
+
+export type AbilityDetail = {
+  shortEffect: string;
+  effect: string;
+  flavor: string;
+};
+
+export type DamageClass = "physical" | "special" | "status";
+
+export const DAMAGE_CLASS_LABEL: Record<DamageClass, string> = {
+  physical: "Physical",
+  special: "Special",
+  status: "Status",
+};
+
+export type LearnMethod = "level-up" | "machine" | "egg" | "tutor" | "other";
+
+export const LEARN_METHOD_LABEL: Record<LearnMethod, string> = {
+  "level-up": "Level up",
+  machine: "TM / TR",
+  egg: "Egg",
+  tutor: "Tutor",
+  other: "Other",
+};
+
+export const ALL_LEARN_METHODS: LearnMethod[] = [
+  "level-up",
+  "machine",
+  "egg",
+  "tutor",
+  "other",
+];
+
+export type MoveEntry = {
+  slug: string;
+  name: string;
+  learnMethod: LearnMethod;
+  level: number;
+};
+
+export type MoveDetail = {
+  slug: string;
+  name: string;
+  type: PokeType;
+  damageClass: DamageClass;
+  power: number | null;
+  accuracy: number | null;
+  pp: number | null;
+  shortEffect: string;
+  effect: string;
+};
+
+export type EvoCondition = {
+  trigger: string;
+  minLevel: number | null;
+  item: string | null;
+  heldItem: string | null;
+  timeOfDay: string;
+  location: string | null;
+  knownMove: string | null;
+  knownMoveType: string | null;
+  usedMove: string | null;
+  minHappiness: number | null;
+  minBeauty: number | null;
+  minAffection: number | null;
+  gender: number | null;
+  needsOverworldRain: boolean;
+  needsMultiplayer: boolean;
+  turnUpsideDown: boolean;
+  relativePhysicalStats: number | null;
+  tradeSpecies: string | null;
+  partySpecies: string | null;
+  partyType: string | null;
+};
+
 export type EvolutionNode = {
   id: number;
+  conditions: EvoCondition[];
   children: EvolutionNode[];
 };
+
+export type TypeRelation = {
+  doubleFrom: PokeType[];
+  halfFrom: PokeType[];
+  noFrom: PokeType[];
+  doubleTo: PokeType[];
+  halfTo: PokeType[];
+  noTo: PokeType[];
+};
+
+export type DamageRelations = Record<PokeType, TypeRelation>;
 
 export type Gen = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -95,7 +187,7 @@ export type PokemonForm = {
   types: PokeType[];
   height: number;
   weight: number;
-  abilities: string[];
+  abilities: Ability[];
   stats: Stats;
   art: string;
   sprite: string;
@@ -104,13 +196,18 @@ export type PokemonForm = {
 export type PokemonFull = PokemonLite & {
   height: number;
   weight: number;
-  abilities: string[];
+  abilities: Ability[];
   stats: Stats;
-  moves: string[];
+  movepool: MoveEntry[];
+  moveDetail: Record<string, MoveDetail>;
+  abilityDetail: Record<string, AbilityDetail>;
   evolution: EvolutionNode;
+  babyTriggerItem: string | null;
   flavor: string;
   forms: PokemonForm[];
   names: LocalizedName[];
+  damageRelations: DamageRelations;
+  versionGroup: string | null;
 };
 
 export type Pokemon = PokemonFull;
