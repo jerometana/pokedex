@@ -1,0 +1,41 @@
+:root {
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --type-scale: 1;
+
+  --bg: #F7F7F4;
+  --surface: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --ink: #0F172A;
+  --ink-2: #475569;
+  --ink-3: #94A3B8;
+  --line: #ECECE6;
+  --line-2: #F1F1EC;
+  --bar-track: #F1F1EC;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 1px 2px rgba(15, 23, 42, 0.04), 0 30px 60px rgba(15, 23, 42, 0.08);
+  --skeleton-a: #F1F1EC;
+  --skeleton-b: #E6E6DF;
+  --radius-card: 28px;
+  --radius-panel: 24px;
+  --radius-chip: 999px;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A0B0E;
+  --surface: #141519;
+  --card-bg: #16181D;
+  --ink: #F7F7F4;
+  --ink-2: #B6BBC4;
+  --ink-3: #6B7280;
+  --line: #23262D;
+  --line-2: #1B1D22;
+  --bar-track: #23262D;
+  --skeleton-a: #1B1D22;
+  --skeleton-b: #23262D;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.3), 0 30px 60px rgba(0, 0, 0, 0.5);
+}

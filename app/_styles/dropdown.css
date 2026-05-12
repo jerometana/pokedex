@@ -1,0 +1,111 @@
+.dd { position: relative; }
+.dd-trigger {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--line);
+  color: var(--ink); font: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 10px 8px 14px; border-radius: 12px; cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 140ms, box-shadow 140ms, background 140ms;
+  min-height: 38px;
+}
+.dd-trigger:hover { border-color: #CBD5E1; box-shadow: var(--shadow-md); }
+:root[data-theme="dark"] .dd-trigger:hover { border-color: #3A3F49; }
+.dd-trigger.active { border-color: var(--ink); }
+.dd-trigger.open { border-color: var(--ink); box-shadow: var(--shadow-md), 0 0 0 4px rgba(15, 23, 42, 0.05); }
+:root[data-theme="dark"] .dd-trigger.open { box-shadow: var(--shadow-md), 0 0 0 4px rgba(255, 255, 255, 0.06); }
+.dd-label {
+  color: var(--ink-3); font-weight: 700;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.dd-summary { color: var(--ink); }
+.dd-summary.muted { color: var(--ink-3); font-weight: 500; }
+.dd-chips { display: inline-flex; gap: 4px; align-items: center; max-width: 280px; }
+.dd-chip {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+  background: var(--line-2); color: var(--ink);
+  text-transform: capitalize; white-space: nowrap;
+}
+.dd-chip-more { background: var(--ink); color: var(--surface); font-variant-numeric: tabular-nums; }
+.dd-chev {
+  display: inline-grid; place-items: center;
+  color: var(--ink-3); transition: transform 180ms cubic-bezier(.2,.8,.2,1);
+}
+.dd-chev.up { transform: rotate(180deg); color: var(--ink); }
+
+.dd-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; box-shadow: var(--shadow-lg);
+  overflow: hidden; padding: 6px;
+  transform-origin: top left;
+}
+.dd-menu-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px 8px; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3);
+  border-bottom: 1px solid var(--line-2);
+}
+.dd-count {
+  display: inline-grid; place-items: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  margin-left: 6px; border-radius: 999px;
+  background: var(--ink); color: var(--surface);
+  font-size: 10px; letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.dd-clear {
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--ink-2); font: inherit; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 6px;
+}
+.dd-clear:hover { background: var(--line-2); color: var(--ink); }
+
+.dd-search {
+  display: flex; align-items: center; gap: 8px;
+  margin: 6px 4px 4px;
+  padding: 7px 10px; border-radius: 9px;
+  background: var(--line-2); color: var(--ink-3);
+}
+.dd-search input {
+  flex: 1; border: 0; outline: 0; background: transparent;
+  font: inherit; font-size: 13px; color: var(--ink);
+}
+.dd-search input::placeholder { color: var(--ink-3); }
+
+.dd-menu-list {
+  display: flex; flex-direction: column; gap: 1px;
+  margin-top: 4px; max-height: 320px; overflow-y: auto;
+  scrollbar-width: thin;
+}
+.dd-empty {
+  padding: 16px 10px; text-align: center;
+  font-size: 12.5px; color: var(--ink-3);
+}
+.dd-opt {
+  display: flex; align-items: center; gap: 10px;
+  background: transparent; border: 0; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 500; color: var(--ink);
+  padding: 8px 10px; border-radius: 10px; text-align: left;
+  transition: background 100ms;
+}
+.dd-opt:hover { background: var(--line-2); }
+.dd-opt.on { font-weight: 600; }
+.dd-check {
+  width: 16px; height: 16px; border-radius: 5px;
+  border: 1.5px solid var(--line); background: var(--surface);
+  display: inline-grid; place-items: center; color: var(--surface);
+  flex-shrink: 0;
+  transition: background 120ms, border-color 120ms;
+}
+.dd-opt:hover .dd-check { border-color: #CBD5E1; }
+.dd-check.on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.dd-type { display: inline-flex; align-items: center; gap: 8px; transition: padding 120ms; }
+.dd-type-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+
+@media (max-width: 720px) {
+  .dd-chips { max-width: 160px; overflow: hidden; }
+}
