@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 
 export type Mode = "light" | "dark";
 export type Density = "cozy" | "compact";
@@ -22,37 +28,52 @@ const TWEAK_DEFAULTS: Tweaks = {
 
 const TWEAKS_KEY = "pokedex.tweaks";
 
+let memo: Tweaks | null = null;
+const listeners = new Set<() => void>();
+
+function readClient(): Tweaks {
+  if (memo) return memo;
+  try {
+    const raw = localStorage.getItem(TWEAKS_KEY);
+    memo = raw
+      ? { ...TWEAK_DEFAULTS, ...(JSON.parse(raw) as Partial<Tweaks>) }
+      : TWEAK_DEFAULTS;
+  } catch {
+    memo = TWEAK_DEFAULTS;
+  }
+  return memo;
+}
+
+function subscribe(fn: () => void) {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
+function writeTweaks(next: Tweaks) {
+  memo = next;
+  try {
+    localStorage.setItem(TWEAKS_KEY, JSON.stringify(next));
+  } catch {}
+  const root = document.documentElement;
+  root.dataset.theme = next.mode;
+  root.style.setProperty("--type-scale", (next.typeScale / 100).toString());
+  for (const l of listeners) l();
+}
+
 export function useTweaks() {
-  const [t, setT] = useState<Tweaks>(TWEAK_DEFAULTS);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(TWEAKS_KEY);
-      if (raw) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setT({ ...TWEAK_DEFAULTS, ...JSON.parse(raw) });
-      }
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(TWEAKS_KEY, JSON.stringify(t));
-    } catch {}
-  }, [t]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.theme = t.mode;
-    root.style.setProperty("--type-scale", (t.typeScale / 100).toString());
-  }, [t.mode, t.typeScale]);
-
+  const t = useSyncExternalStore(
+    subscribe,
+    readClient,
+    () => TWEAK_DEFAULTS,
+  );
   const setTweak = useCallback(
-    <K extends keyof Tweaks>(k: K, v: Tweaks[K]) =>
-      setT((prev) => ({ ...prev, [k]: v })),
+    <K extends keyof Tweaks>(k: K, v: Tweaks[K]) => {
+      writeTweaks({ ...readClient(), [k]: v });
+    },
     [],
   );
-
   return { t, setTweak };
 }
 

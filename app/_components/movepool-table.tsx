@@ -36,6 +36,16 @@ export function MovepoolTable({
   const rows = byMethod.get(active) ?? [];
   const showLevel = active === "level-up";
 
+  const PAGE = 40;
+  const [visible, setVisible] = useState(PAGE);
+  const [prevActive, setPrevActive] = useState(active);
+  if (prevActive !== active) {
+    setPrevActive(active);
+    setVisible(PAGE);
+  }
+  const shown = rows.slice(0, visible);
+  const remaining = rows.length - shown.length;
+
   return (
     <div className="movepool">
       <div className="movepool-tabs" role="tablist">
@@ -74,7 +84,7 @@ export function MovepoolTable({
             </tr>
           </thead>
           <tbody>
-            {rows.map((entry) => {
+            {shown.map((entry) => {
               const d = detail[entry.slug];
               const isOpen = openSlug === entry.slug;
               return (
@@ -90,6 +100,15 @@ export function MovepoolTable({
             })}
           </tbody>
         </table>
+        {remaining > 0 && (
+          <button
+            type="button"
+            className="movepool-more"
+            onClick={() => setVisible((v) => v + PAGE)}
+          >
+            Show more ({remaining})
+          </button>
+        )}
       </div>
     </div>
   );

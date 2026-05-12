@@ -54,6 +54,14 @@
   font-family: var(--font-mono); font-size: 11px; opacity: 0.7;
 }
 .movepool-scroll { max-height: 380px; overflow-y: auto; border: 1px solid var(--line); border-radius: 14px; }
+.movepool-more {
+  margin-top: 8px; align-self: center; padding: 6px 14px;
+  border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card-bg); color: var(--ink-2);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 120ms;
+}
+.movepool-more:hover { background: var(--line-2); }
 .movepool-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .movepool-table th, .movepool-table td {
   padding: 8px 10px; text-align: left; vertical-align: middle;
