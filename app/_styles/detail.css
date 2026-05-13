@@ -78,14 +78,16 @@
   color: var(--ink-3); letter-spacing: 0.5px; text-transform: uppercase;
   white-space: nowrap;
 }
-.shiny-toggle {
+.shiny-toggle,
+.cry-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 32px; height: 32px; border-radius: 999px;
   border: 1px solid var(--line); background: var(--surface);
   color: var(--ink-3); cursor: pointer;
   transition: color 120ms ease, background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
-.shiny-toggle:hover { color: var(--ink); transform: translateY(-1px); }
+.shiny-toggle:hover,
+.cry-btn:hover { color: var(--ink); transform: translateY(-1px); }
 .shiny-toggle.on {
   color: #B45309;
   background: #FFF7E0;
@@ -96,6 +98,25 @@
   color: #FBE38A;
   background: rgba(245, 215, 122, 0.12);
   border-color: rgba(245, 215, 122, 0.45);
+}
+.cry-btn.is-playing {
+  color: #1D4ED8;
+  background: #EAF2FF;
+  border-color: #93C5FD;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  animation: cry-pulse 1s ease-in-out infinite;
+}
+:root[data-theme="dark"] .cry-btn.is-playing {
+  color: #BFDBFE;
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+@keyframes cry-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2); }
+  50% { box-shadow: 0 0 0 7px rgba(96, 165, 250, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cry-btn.is-playing { animation: none; }
 }
 .focus-hero-art {
   position: relative; z-index: 1;

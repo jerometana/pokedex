@@ -272,6 +272,7 @@ async function buildForm(
         stats,
         art: ART(pkmn.id),
         sprite: SPRITE(pkmn.id),
+        cry: pkmn.cries?.latest ?? pkmn.cries?.legacy ?? null,
       },
       raw: pkmn,
     };
