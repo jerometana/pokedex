@@ -5,8 +5,21 @@ import type { ImageFeatureExtractionPipeline } from "@huggingface/transformers";
 const MODEL = "Xenova/clip-vit-base-patch32";
 const DTYPE = "q8";
 
+type Entry = {
+  refId: number;
+  id: number;
+  slug: string;
+  label: string;
+  isDefault: boolean;
+};
+
+type EmbeddingsBundle = {
+  data: Float32Array;
+  entries: Entry[];
+  dim: number;
+};
+
 let modelPromise: Promise<ImageFeatureExtractionPipeline> | null = null;
-type EmbeddingsBundle = { data: Float32Array; ids: Set<number>; dim: number };
 let embedsPromise: Promise<EmbeddingsBundle> | null = null;
 
 async function loadModel(): Promise<ImageFeatureExtractionPipeline> {
@@ -33,18 +46,21 @@ async function loadEmbeddings(): Promise<EmbeddingsBundle> {
       const buf = await binRes.arrayBuffer();
       const meta = (await jsonRes.json()) as {
         dim: number;
-        ids: number[];
-        maxId: number;
+        entries: Entry[];
       };
       const data = new Float32Array(buf);
-      return { data, ids: new Set(meta.ids), dim: meta.dim };
+      return { data, entries: meta.entries, dim: meta.dim };
     })();
   }
   return embedsPromise;
 }
 
 export type SearchStage = "model" | "embeddings" | "embed" | "rank";
-export type ImageSearchResult = { id: number; score: number };
+export type ImageSearchResult = {
+  id: number;
+  score: number;
+  formLabel: string | null;
+};
 
 export async function searchByImage(
   file: Blob,
@@ -53,7 +69,7 @@ export async function searchByImage(
   onStage?.("model");
   const extractor = await loadModel();
   onStage?.("embeddings");
-  const { data: indexData, ids: indexIds, dim } = await loadEmbeddings();
+  const { data: indexData, entries, dim } = await loadEmbeddings();
   onStage?.("embed");
   const { RawImage } = await import("@huggingface/transformers");
   const img = await RawImage.read(file);
@@ -64,14 +80,24 @@ export async function searchByImage(
   const inv = 1 / (Math.sqrt(qn) || 1);
   for (let i = 0; i < q.length; i++) q[i] *= inv;
   onStage?.("rank");
-  const maxId = indexData.length / dim;
-  const results: ImageSearchResult[] = [];
-  for (let id = 1; id <= maxId; id++) {
-    if (!indexIds.has(id)) continue;
-    const off = (id - 1) * dim;
+
+  const bestByRef = new Map<number, { score: number; entry: Entry }>();
+  for (let i = 0; i < entries.length; i++) {
+    const off = i * dim;
     let s = 0;
     for (let k = 0; k < dim; k++) s += q[k] * indexData[off + k];
-    results.push({ id, score: s });
+    const entry = entries[i];
+    const prev = bestByRef.get(entry.refId);
+    if (!prev || s > prev.score) bestByRef.set(entry.refId, { score: s, entry });
+  }
+
+  const results: ImageSearchResult[] = [];
+  for (const { score, entry } of bestByRef.values()) {
+    results.push({
+      id: entry.refId,
+      score,
+      formLabel: entry.isDefault ? null : entry.label,
+    });
   }
   results.sort((a, b) => b.score - a.score);
   return results;

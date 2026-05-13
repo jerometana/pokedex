@@ -91,6 +91,7 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [imageSearch, setImageSearch] = useState<{
     scores: Map<number, number>;
+    formLabels: Map<number, string>;
     previewUrl: string;
   } | null>(null);
 
@@ -107,10 +108,14 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
   const handleImageResults = useCallback(
     (results: ImageSearchResult[], previewUrl: string) => {
       const scores = new Map<number, number>();
-      for (const r of results) scores.set(r.id, r.score);
+      const formLabels = new Map<number, string>();
+      for (const r of results) {
+        scores.set(r.id, r.score);
+        if (r.formLabel) formLabels.set(r.id, r.formLabel);
+      }
       setImageSearch((prev) => {
         if (prev?.previewUrl) URL.revokeObjectURL(prev.previewUrl);
-        return { scores, previewUrl };
+        return { scores, formLabels, previewUrl };
       });
     },
     [],
@@ -269,7 +274,11 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         {filtered.length === 0 ? (
           <Empty />
         ) : (
-          <CatalogGrid list={filtered} density={t.density} />
+          <CatalogGrid
+            list={filtered}
+            density={t.density}
+            formLabels={imageSearch?.formLabels ?? null}
+          />
         )}
       </main>
     </div>

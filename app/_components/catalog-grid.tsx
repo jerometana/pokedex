@@ -17,9 +17,11 @@ const EAGER_COUNT = 12;
 export function CatalogGrid({
   list,
   density,
+  formLabels,
 }: {
   list: PokemonLite[];
   density: Density;
+  formLabels?: Map<number, string> | null;
 }) {
   const minCell = density === "compact" ? 150 : 220;
   const estimatedRow = density === "compact" ? 240 : 340;
@@ -87,6 +89,7 @@ export function CatalogGrid({
             >
               {row.map((p, i) => {
                 const globalIdx = start + i;
+                const matchedForm = formLabels?.get(p.id) ?? null;
                 return (
                   <Link
                     key={p.id}
@@ -131,6 +134,11 @@ export function CatalogGrid({
                           }}
                         >
                           <RarityBadges rarities={p.rarity} />
+                        </div>
+                      )}
+                      {matchedForm && (
+                        <div className="grid-card-form-match" title={`Matched: ${matchedForm}`}>
+                          {matchedForm}
                         </div>
                       )}
                     </div>
