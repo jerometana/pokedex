@@ -465,12 +465,8 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
   const abilitySlugs = Array.from(
     new Set(forms.flatMap((f) => f.abilities.map((a) => a.slug))),
   );
-  const moveSlugs = Array.from(new Set(movepool.map((m) => m.slug)));
 
-  const [abilityDetail, moveDetail] = await Promise.all([
-    fetchAbilityDetails(abilitySlugs),
-    fetchMoveDetails(moveSlugs),
-  ]);
+  const abilityDetail = await fetchAbilityDetails(abilitySlugs);
 
   const defaultAbilities = defaultBundle?.form.abilities ?? buildFormAbilities(pkmn);
   const formTags = deriveFormTags(species.name, forms.map((f) => f.slug));
@@ -485,7 +481,7 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     abilities: defaultAbilities,
     stats,
     movepool,
-    moveDetail,
+    moveDetail: {},
     abilityDetail,
     evolution: buildEvoTree(chain.chain as EvoLink),
     babyTriggerItem: chain.baby_trigger_item?.name ?? null,
@@ -499,6 +495,30 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     damageRelations,
     versionGroup,
   };
+}
+
+export async function getPokemonMoveDetail(
+  id: number,
+): Promise<Record<string, MoveDetail>> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(`pokemon:${id}:moves`);
+
+  const [pkmn, species] = await Promise.all([
+    P.getPokemonByName(id),
+    P.getPokemonSpeciesByName(id),
+  ]);
+
+  const defaultVariety =
+    species.varieties.find((v) => v.is_default) ?? species.varieties[0];
+  const defaultRaw = defaultVariety
+    ? await P.getPokemonByName(defaultVariety.pokemon.name)
+    : pkmn;
+
+  const versionGroup = pickBestVersionGroup(defaultRaw);
+  const movepool = buildMovepool(defaultRaw, versionGroup);
+  const slugs = Array.from(new Set(movepool.map((m) => m.slug)));
+  return fetchMoveDetails(slugs);
 }
 
 function deriveFormTags(speciesSlug: string, formSlugs: string[]): FormCategory[] {

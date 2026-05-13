@@ -1,10 +1,16 @@
 "use client";
 
-import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
+import { Suspense } from "react";
+import {
+  TYPE_COLORS,
+  type MoveDetail,
+  type PokemonForm,
+  type PokemonFull,
+} from "@/lib/types";
 import { evoLabel, EvoTree } from "./evo-tree";
 import { FormCard } from "./form-card";
 import { MatchupChart } from "./matchup-chart";
-import { MovepoolTable } from "./movepool-table";
+import { MovesPanel } from "./moves-panel";
 import { StatBar } from "./stat-bar";
 import type { PokemonLite } from "@/lib/types";
 
@@ -32,11 +38,13 @@ export function DetailPanels({
   active,
   onSelectForm,
   liteById,
+  movesPromise,
 }: {
   full: PokemonFull;
   active: PokemonForm;
   onSelectForm: (id: number) => void;
   liteById: Record<number, PokemonLite>;
+  movesPromise: Promise<Record<string, MoveDetail>>;
 }) {
   const tint = TYPE_COLORS[active.types[0]].chip;
   const total = Object.values(active.stats).reduce((a, b) => a + b, 0);
@@ -83,7 +91,9 @@ export function DetailPanels({
             {full.versionGroup ? ` · ${vgLabel(full.versionGroup)}` : ""}
           </span>
         </header>
-        <MovepoolTable movepool={full.movepool} detail={full.moveDetail} />
+        <Suspense fallback={null}>
+          <MovesPanel movepool={full.movepool} movesPromise={movesPromise} />
+        </Suspense>
       </section>
 
       {hasEvolution && (
