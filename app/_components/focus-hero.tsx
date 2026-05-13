@@ -7,6 +7,7 @@ import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants } from "../_lib/animations";
 import { AbilityChip } from "./ability-chip";
+import { CryButton } from "./cry-button";
 import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
 import { RarityBadges } from "./rarity-badge";
@@ -77,6 +78,7 @@ export function FocusHero({
           <RarityBadges rarities={full.rarity} />
         </div>
         <div className="focus-hero-top-right">
+          <CryButton src={active.cry} name={displayName} />
           <button
             type="button"
             className={`shiny-toggle ${shiny ? "on" : ""}`}

@@ -190,6 +190,7 @@ export type PokemonForm = {
   stats: Stats;
   art: string;
   sprite: string;
+  cry: string | null;
 };
 
 export type PokemonFull = PokemonLite & {

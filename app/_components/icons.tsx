@@ -1,3 +1,22 @@
+export function SpeakerIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M11 5 6 9H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h3l5 4z" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M18.36 5.64a9 9 0 0 1 0 12.73" />
+    </svg>
+  );
+}
+
 export function ChevronDown() {
   return (
     <svg
