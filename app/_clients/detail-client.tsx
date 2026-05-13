@@ -88,7 +88,7 @@ export function DetailClient({
           <div className="detail-paginator">
             <Link
               href={pokemonHref(prev.id)}
-              prefetch
+              prefetch={null}
               className="nav-btn"
               aria-label="Previous"
             >
@@ -103,7 +103,7 @@ export function DetailClient({
             </div>
             <Link
               href={pokemonHref(next.id)}
-              prefetch
+              prefetch={null}
               className="nav-btn"
               aria-label="Next"
             >
