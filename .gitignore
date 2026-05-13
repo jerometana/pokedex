@@ -43,5 +43,3 @@ next-env.d.ts
 .claude
 .cache
 .sprite-cache
-/public/sprite-embeddings.bin
-/public/sprite-embeddings.json
