@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { DetailClient } from "@/app/_clients/detail-client";
 import { getAllPokemonLite, getFullPokemon } from "@/lib/pokeapi";
@@ -9,12 +10,12 @@ function collectEvoIds(node: EvolutionNode, out: number[] = []): number[] {
   return out;
 }
 
-export default async function Page({
-  params,
+async function DetailContent({
+  paramsPromise,
 }: {
-  params: Promise<{ id: string }>;
+  paramsPromise: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id } = await paramsPromise;
   const n = Number(id);
   if (!Number.isFinite(n) || n < 1 || n > 1025) notFound();
 
@@ -50,6 +51,18 @@ export default async function Page({
       total={total}
       evoLites={evoLites}
     />
+  );
+}
+
+export default function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <DetailContent paramsPromise={params} />
+    </Suspense>
   );
 }
 
