@@ -14,8 +14,9 @@ import {
   type PokeType,
   type Rarity,
 } from "@/lib/types";
+import Image from "next/image";
 import { romanize } from "../_lib/helpers";
-import { CloseIcon, SearchIcon } from "./icons";
+import { CameraIcon, CloseIcon, SearchIcon } from "./icons";
 import { MultiDropdown } from "./multi-dropdown";
 import { TypeChip } from "./type-chip";
 
@@ -53,6 +54,9 @@ export function FilterBar({
   activeRarities,
   toggleRarity,
   clearRarities,
+  imageSearchUrl,
+  onOpenImageSearch,
+  onClearImageSearch,
   count,
 }: {
   query: string;
@@ -69,6 +73,9 @@ export function FilterBar({
   activeRarities: Set<Rarity>;
   toggleRarity: (r: Rarity) => void;
   clearRarities: () => void;
+  imageSearchUrl: string | null;
+  onOpenImageSearch: () => void;
+  onClearImageSearch: () => void;
   count: number;
 }) {
   return (
@@ -94,6 +101,36 @@ export function FilterBar({
               aria-label="Clear"
             >
               <CloseIcon />
+            </button>
+          )}
+          {imageSearchUrl ? (
+            <button
+              type="button"
+              className="img-search-chip"
+              onClick={onClearImageSearch}
+              aria-label="Clear image search"
+              title="Clear image search"
+            >
+              <Image
+                src={imageSearchUrl}
+                alt=""
+                width={28}
+                height={28}
+                unoptimized
+              />
+              <span className="img-search-chip-x">
+                <CloseIcon />
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="img-search-btn"
+              onClick={onOpenImageSearch}
+              aria-label="Search by image"
+              title="Search by image"
+            >
+              <CameraIcon size={20} />
             </button>
           )}
         </div>

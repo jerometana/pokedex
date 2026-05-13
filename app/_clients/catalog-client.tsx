@@ -16,7 +16,9 @@ import {
 import { CatalogGrid } from "../_components/catalog-grid";
 import { Empty } from "../_components/empty";
 import { FilterBar } from "../_components/filter-bar";
+import { ImageSearchModal } from "../_components/image-search-modal";
 import { useTweaks } from "../_components/tweaks";
+import type { ImageSearchResult } from "@/lib/image-search";
 
 const Q_KEY = "q";
 const GENS_KEY = "gens";
@@ -86,9 +88,40 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
 
   const [query, setQuery] = useState(urlQuery);
 
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [imageSearch, setImageSearch] = useState<{
+    scores: Map<number, number>;
+    previewUrl: string;
+  } | null>(null);
+
   useEffect(() => {
     setQuery(urlQuery);
   }, [urlQuery]);
+
+  useEffect(() => {
+    return () => {
+      if (imageSearch?.previewUrl) URL.revokeObjectURL(imageSearch.previewUrl);
+    };
+  }, [imageSearch?.previewUrl]);
+
+  const handleImageResults = useCallback(
+    (results: ImageSearchResult[], previewUrl: string) => {
+      const scores = new Map<number, number>();
+      for (const r of results) scores.set(r.id, r.score);
+      setImageSearch((prev) => {
+        if (prev?.previewUrl) URL.revokeObjectURL(prev.previewUrl);
+        return { scores, previewUrl };
+      });
+    },
+    [],
+  );
+
+  const clearImageSearch = useCallback(() => {
+    setImageSearch((prev) => {
+      if (prev?.previewUrl) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+  }, []);
 
   const writeParams = useCallback(
     (mutate: (p: URLSearchParams) => void) => {
@@ -181,7 +214,7 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return pokemon.filter((p) => {
+    const list = pokemon.filter((p) => {
       if (q) {
         const idMatch =
           String(p.id).includes(q) || String(p.id).padStart(4, "0").includes(q);
@@ -196,9 +229,16 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         return false;
       return true;
     });
-  }, [pokemon, query, activeGens, activeTypes, activeForms, activeRarities]);
+    if (imageSearch) {
+      const { scores } = imageSearch;
+      return list
+        .filter((p) => scores.has(p.id))
+        .sort((a, b) => (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0));
+    }
+    return list;
+  }, [pokemon, query, activeGens, activeTypes, activeForms, activeRarities, imageSearch]);
 
-  const resetKey = `${query}|${Array.from(activeGens).sort().join(",")}|${Array.from(activeTypes).sort().join(",")}|${Array.from(activeForms).sort().join(",")}|${Array.from(activeRarities).sort().join(",")}`;
+  const resetKey = `${query}|${Array.from(activeGens).sort().join(",")}|${Array.from(activeTypes).sort().join(",")}|${Array.from(activeForms).sort().join(",")}|${Array.from(activeRarities).sort().join(",")}|${imageSearch?.previewUrl ?? ""}`;
 
   return (
     <div className={`app density-${t.density}`}>
@@ -217,7 +257,15 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         activeRarities={activeRarities}
         toggleRarity={toggleRarity}
         clearRarities={clearRarities}
+        imageSearchUrl={imageSearch?.previewUrl ?? null}
+        onOpenImageSearch={() => setImageModalOpen(true)}
+        onClearImageSearch={clearImageSearch}
         count={filtered.length}
+      />
+      <ImageSearchModal
+        open={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        onResults={handleImageResults}
       />
       <main className="main">
         {filtered.length === 0 ? (
