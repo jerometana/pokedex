@@ -8,8 +8,6 @@
   box-shadow: var(--shadow-sm);
   transition: transform 160ms cubic-bezier(.2, .8, .2, 1), box-shadow 160ms;
   display: flex; flex-direction: column;
-  content-visibility: auto;
-  contain-intrinsic-size: 320px;
 }
 .grid-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .grid-card-art {
@@ -28,7 +26,7 @@
 
 @media (max-width: 720px) {
   .grid-view { gap: 10px; --grid-min: min(150px, 44vw); }
-  .grid-card { padding: 10px; border-radius: 18px; contain-intrinsic-size: 220px; }
+  .grid-card { padding: 10px; border-radius: 18px; }
   .grid-card-art { padding: 6px; border-radius: 12px; }
   .grid-card-name { font-size: 14px; }
   .grid-card-foot { padding: 6px 2px 2px; }
