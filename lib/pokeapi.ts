@@ -1,6 +1,9 @@
 import { cacheLife, cacheTag } from "next/cache";
 import Pokedex from "pokedex-promise-v2";
 import { rarityFor } from "./rarity";
+import romajiData from "./romaji.json";
+
+const ROMAJI = romajiData as Record<string, string>;
 import type {
   Ability,
   AbilityDetail,
@@ -479,6 +482,7 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     id: pkmn.id,
     name: titleCase(pkmn.name),
     gen: GEN_KEY[species.generation.name] ?? 1,
+    romaji: ROMAJI[String(pkmn.id)] ?? null,
     types,
     height: Math.round((pkmn.height / 10) * 10) / 10,
     weight: Math.round((pkmn.weight / 10) * 10) / 10,
@@ -595,6 +599,7 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
       sprite: SPRITE(id),
       formTags: Array.from(tagsBySpeciesId.get(id) ?? []),
       rarity: rarityFor(id),
+      romaji: ROMAJI[String(id)] ?? null,
     });
   }
 

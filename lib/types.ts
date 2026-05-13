@@ -177,6 +177,7 @@ export type PokemonLite = {
   sprite: string;
   formTags: FormCategory[];
   rarity: Rarity[];
+  romaji: string | null;
 };
 
 export type PokemonForm = {

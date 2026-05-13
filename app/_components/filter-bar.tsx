@@ -92,7 +92,7 @@ export function FilterBar({
           </span>
           <input
             type="text"
-            placeholder="Search by name or number"
+            placeholder="Search by name (EN / romaji) or number"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={{ fontSize: "1.2rem" }}
