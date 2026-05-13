@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "embed-sprites": "node scripts/embed-sprites.mjs",
-    "build-romaji": "node scripts/build-romaji.mjs"
+    "embed-sprites": "node scripts/embed-sprites.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
