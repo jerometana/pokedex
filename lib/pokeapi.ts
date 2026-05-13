@@ -1,9 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import Pokedex from "pokedex-promise-v2";
 import { rarityFor } from "./rarity";
-import romajiData from "./romaji.json";
-
-const ROMAJI = romajiData as Record<string, string>;
 import type {
   Ability,
   AbilityDetail,
@@ -162,6 +159,14 @@ function pickLocalizedNames(species: Pokedex.PokemonSpecies): LocalizedName[] {
     if (name) out.push({ lang: code, label, name });
   }
   return out;
+}
+
+const ROMAJI_LANGS = ["roomaji", "ja-roma", "ja-Latn"];
+function pickRomaji(species: Pokedex.PokemonSpecies): string | null {
+  for (const entry of species.names) {
+    if (ROMAJI_LANGS.includes(entry.language.name)) return entry.name;
+  }
+  return null;
 }
 
 function pickFlavor(species: Pokedex.PokemonSpecies): string {
@@ -483,7 +488,7 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     id: pkmn.id,
     name: titleCase(pkmn.name),
     gen: GEN_KEY[species.generation.name] ?? 1,
-    romaji: ROMAJI[String(pkmn.id)] ?? null,
+    romaji: pickRomaji(species),
     types,
     height: Math.round((pkmn.height / 10) * 10) / 10,
     weight: Math.round((pkmn.weight / 10) * 10) / 10,
@@ -584,6 +589,17 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
     tagsBySpeciesId.set(speciesId, cur);
   }
 
+  const speciesIds = baseEntries
+    .map((e) => e.id)
+    .filter((id) => typesByPokemonId.has(id) && genByPokemonId.has(id));
+  const speciesList = await P.getPokemonSpeciesByName(
+    speciesIds as unknown as string[],
+  );
+  const romajiBySpeciesId = new Map<number, string | null>();
+  for (const sp of speciesList) {
+    romajiBySpeciesId.set(sp.id, pickRomaji(sp));
+  }
+
   const lite: PokemonLite[] = [];
   for (const entry of baseEntries) {
     const { id, name } = entry;
@@ -598,7 +614,7 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
       art: ART(id),
       formTags: Array.from(tagsBySpeciesId.get(id) ?? []),
       rarity: rarityFor(id),
-      romaji: ROMAJI[String(id)] ?? null,
+      romaji: romajiBySpeciesId.get(id) ?? null,
     });
   }
 
