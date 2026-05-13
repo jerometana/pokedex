@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { PokemonFull, PokemonLite } from "@/lib/types";
+import type { MoveDetail, PokemonFull, PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
 import { DetailHeader } from "../_components/detail-header";
 import { DetailPanels } from "../_components/detail-panels";
@@ -25,12 +25,14 @@ export function DetailClient({
   idx,
   total,
   evoLites,
+  movesPromise,
 }: {
   full: PokemonFull;
   neighbors: Neighbors;
   idx: number;
   total: number;
   evoLites: Record<number, PokemonLite>;
+  movesPromise: Promise<Record<string, MoveDetail>>;
 }) {
   const { t } = useTweaks();
   const router = useRouter();
@@ -117,6 +119,7 @@ export function DetailClient({
             active={active}
             onSelectForm={handleSelectForm}
             liteById={evoLites}
+            movesPromise={movesPromise}
           />
         </div>
       </main>
