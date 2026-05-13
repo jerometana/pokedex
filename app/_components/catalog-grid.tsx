@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { TYPE_COLORS, type PokemonLite } from "@/lib/types";
 import { pokemonHref } from "../_lib/helpers";
@@ -17,11 +17,9 @@ const EAGER_COUNT = 12;
 export function CatalogGrid({
   list,
   density,
-  resetKey,
 }: {
   list: PokemonLite[];
   density: Density;
-  resetKey: string;
 }) {
   const minCell = density === "compact" ? 150 : 220;
   const estimatedRow = density === "compact" ? 240 : 340;
@@ -59,10 +57,6 @@ export function CatalogGrid({
     overscan: 4,
     scrollMargin: offsetTop,
   });
-
-  useEffect(() => {
-    virtualizer.scrollToOffset(offsetTop, { align: "start" });
-  }, [resetKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const items = virtualizer.getVirtualItems();
   const totalHeight = virtualizer.getTotalSize();

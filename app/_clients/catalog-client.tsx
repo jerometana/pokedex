@@ -238,8 +238,6 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
     return list;
   }, [pokemon, query, activeGens, activeTypes, activeForms, activeRarities, imageSearch]);
 
-  const resetKey = `${query}|${Array.from(activeGens).sort().join(",")}|${Array.from(activeTypes).sort().join(",")}|${Array.from(activeForms).sort().join(",")}|${Array.from(activeRarities).sort().join(",")}|${imageSearch?.previewUrl ?? ""}`;
-
   return (
     <div className={`app density-${t.density}`}>
       <FilterBar
@@ -271,11 +269,7 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         {filtered.length === 0 ? (
           <Empty />
         ) : (
-          <CatalogGrid
-            list={filtered}
-            density={t.density}
-            resetKey={resetKey}
-          />
+          <CatalogGrid list={filtered} density={t.density} />
         )}
       </main>
     </div>
