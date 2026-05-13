@@ -298,9 +298,23 @@
   .matchup-row { grid-template-columns: 56px 1fr; gap: 10px; padding: 6px 8px; }
   .matchup-mult { font-size: 16px; }
   .evo-stage { min-width: 120px; padding: 10px 12px; }
-  .evo-art { width: 80px; height: 80px; }
-  .evo-arrow { min-width: 60px; }
+  .evo-arrow { min-width: 0; }
   .evo-cond { max-width: 110px; }
+  .evo-row { flex-direction: column; align-items: stretch; overflow-x: visible; }
+  .evo-branch-row { flex-direction: column; align-items: stretch; }
+  .evo-arrow svg { transform: rotate(90deg); }
+  .evo-stage { width: 100%; }
+  .evo-branches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+  }
+  .evo-branches .evo-row { gap: 8px; }
+  .evo-branches .evo-stage { min-width: 0; padding: 8px; }
+  .evo-branches .evo-art { width: 100%; height: auto; aspect-ratio: 1 / 1; padding: 8px; }
+  .evo-branches .evo-arrow { min-width: 0; }
+  .evo-branches .evo-cond { max-width: 100%; }
   .ability-tip { width: 220px; }
 }
 @media (max-width: 420px) {
