@@ -174,7 +174,6 @@ export type PokemonLite = {
   gen: Gen;
   types: PokeType[];
   art: string;
-  sprite: string;
   formTags: FormCategory[];
   rarity: Rarity[];
 };
