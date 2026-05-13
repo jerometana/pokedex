@@ -4,15 +4,10 @@ import { DetailClient } from "@/app/_clients/detail-client";
 import {
   getAllPokemonLite,
   getFullPokemon,
+  getPokemonAbilityDetail,
+  getPokemonEvolution,
   getPokemonMoveDetail,
 } from "@/lib/pokeapi";
-import type { EvolutionNode, PokemonLite } from "@/lib/types";
-
-function collectEvoIds(node: EvolutionNode, out: number[] = []): number[] {
-  out.push(node.id);
-  for (const c of node.children) collectEvoIds(c, out);
-  return out;
-}
 
 async function DetailContent({
   paramsPromise,
@@ -41,12 +36,8 @@ async function DetailContent({
     next2: wrap(idx + 2),
   };
 
-  const evoLites: Record<number, PokemonLite> = {};
-  for (const eid of collectEvoIds(full.evolution)) {
-    const p = all.find((x) => x.id === eid);
-    if (p) evoLites[p.id] = p;
-  }
-
+  const evolutionPromise = getPokemonEvolution(n);
+  const abilityDetailPromise = getPokemonAbilityDetail(n);
   const movesPromise = getPokemonMoveDetail(n);
 
   return (
@@ -55,7 +46,8 @@ async function DetailContent({
       neighbors={neighbors}
       idx={idx}
       total={total}
-      evoLites={evoLites}
+      evolutionPromise={evolutionPromise}
+      abilityDetailPromise={abilityDetailPromise}
       movesPromise={movesPromise}
     />
   );
