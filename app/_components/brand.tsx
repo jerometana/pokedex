@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PokedexWordmark } from "./pokedex-wordmark";
 
 export function Brand({ subtitle }: { subtitle: string }) {
   return (
@@ -11,7 +12,9 @@ export function Brand({ subtitle }: { subtitle: string }) {
         <span className="brand-dot" />
       </div>
       <div>
-        <div className="brand-title">Pokédex</div>
+        <div className="brand-title">
+          <PokedexWordmark />
+        </div>
         <div className="brand-sub">{subtitle}</div>
       </div>
     </Link>

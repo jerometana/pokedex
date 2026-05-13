@@ -18,6 +18,7 @@ import Image from "next/image";
 import { romanize } from "../_lib/helpers";
 import { CameraIcon, CloseIcon, SearchIcon } from "./icons";
 import { MultiDropdown } from "./multi-dropdown";
+import { PokedexWordmark } from "./pokedex-wordmark";
 import { TypeChip } from "./type-chip";
 
 const GEN_OPTIONS: { value: GenNum; label: string }[] = ALL_GENS.map((g) => ({
@@ -81,7 +82,9 @@ export function FilterBar({
   return (
     <header className="filter-bar">
       <div className="filter-bar-inner">
-        <h1 className="hero-title">Pokédex</h1>
+        <h1 className="hero-title">
+          <PokedexWordmark />
+        </h1>
 
         <div className="search-wrap">
           <span style={{ color: "#94A3B8", display: "inline-flex" }}>

@@ -1,0 +1,19 @@
+.poke-wordmark {
+  display: inline;
+  white-space: nowrap;
+}
+
+.poke-ball-wrap {
+  display: inline-block;
+  width: 0.58em;
+  height: 0.58em;
+  vertical-align: -0.02em;
+  margin: 0 0.02em;
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.16));
+}
+
+.poke-ball-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
