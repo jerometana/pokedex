@@ -229,7 +229,9 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
       if (q) {
         const idMatch =
           String(p.id).includes(q) || String(p.id).padStart(4, "0").includes(q);
-        if (!p.name.toLowerCase().includes(q) && !idMatch) return false;
+        const nameMatch = p.name.toLowerCase().includes(q);
+        const romajiMatch = p.romaji?.toLowerCase().includes(q) ?? false;
+        if (!nameMatch && !romajiMatch && !idMatch) return false;
       }
       if (activeGens.size > 0 && !activeGens.has(p.gen)) return false;
       if (activeTypes.size > 0 && !p.types.some((t) => activeTypes.has(t)))
