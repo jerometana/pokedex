@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
-import { TYPE_COLORS, type PokemonForm, type PokemonFull } from "@/lib/types";
+import { Suspense, use, useState } from "react";
+import {
+  TYPE_COLORS,
+  type Ability,
+  type AbilityDetail,
+  type PokemonForm,
+  type PokemonFull,
+} from "@/lib/types";
 import { mixWithWhite, romanize } from "../_lib/helpers";
 import { artVariants } from "../_lib/animations";
 import { AbilityChip } from "./ability-chip";
@@ -12,6 +18,23 @@ import { ChevronLeftIcon, ChevronRightIcon, SparkleIcon } from "./icons";
 import { Num } from "./num";
 import { RarityBadges } from "./rarity-badge";
 import { TypeChip } from "./type-chip";
+
+function AbilitiesRowWithTooltips({
+  abilities,
+  detailPromise,
+}: {
+  abilities: Ability[];
+  detailPromise: Promise<Record<string, AbilityDetail>>;
+}) {
+  const detail = use(detailPromise);
+  return (
+    <>
+      {abilities.map((a) => (
+        <AbilityChip key={a.slug} ability={a} detail={detail[a.slug]} />
+      ))}
+    </>
+  );
+}
 
 function toShiny(url: string): string {
   return url.replace("/official-artwork/", "/official-artwork/shiny/");
@@ -22,13 +45,14 @@ export function FocusHero({
   active,
   accentStrength,
   onSelectForm,
+  abilityDetailPromise,
 }: {
   full: PokemonFull;
   active: PokemonForm;
   accentStrength: number;
   onSelectForm: (id: number) => void;
+  abilityDetailPromise: Promise<Record<string, AbilityDetail>>;
 }) {
-  const abilityDetail = full.abilityDetail;
   const [shiny, setShiny] = useState(false);
   const primary = TYPE_COLORS[active.types[0]];
   const tintBg = accentStrength
@@ -183,13 +207,16 @@ export function FocusHero({
             {active.abilities.length === 0 && (
               <span className="meta-v">N/A</span>
             )}
-            {active.abilities.map((a) => (
-              <AbilityChip
-                key={a.slug}
-                ability={a}
-                detail={abilityDetail[a.slug]}
+            <Suspense
+              fallback={active.abilities.map((a) => (
+                <AbilityChip key={a.slug} ability={a} />
+              ))}
+            >
+              <AbilitiesRowWithTooltips
+                abilities={active.abilities}
+                detailPromise={abilityDetailPromise}
               />
-            ))}
+            </Suspense>
           </div>
         </div>
       </div>

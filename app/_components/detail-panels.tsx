@@ -1,18 +1,18 @@
 "use client";
 
 import { Suspense } from "react";
+import type { PokemonEvolutionBundle } from "@/lib/pokeapi";
 import {
   TYPE_COLORS,
   type MoveDetail,
   type PokemonForm,
   type PokemonFull,
 } from "@/lib/types";
-import { evoLabel, EvoTree } from "./evo-tree";
+import { EvolutionPanel } from "./evolution-panel";
 import { FormCard } from "./form-card";
 import { MatchupChart } from "./matchup-chart";
 import { MovesPanel } from "./moves-panel";
 import { StatBar } from "./stat-bar";
-import type { PokemonLite } from "@/lib/types";
 
 const STAT_ROWS: [string, keyof PokemonFull["stats"]][] = [
   ["HP", "hp"],
@@ -37,19 +37,18 @@ export function DetailPanels({
   full,
   active,
   onSelectForm,
-  liteById,
+  evolutionPromise,
   movesPromise,
 }: {
   full: PokemonFull;
   active: PokemonForm;
   onSelectForm: (id: number) => void;
-  liteById: Record<number, PokemonLite>;
+  evolutionPromise: Promise<PokemonEvolutionBundle>;
   movesPromise: Promise<Record<string, MoveDetail>>;
 }) {
   const tint = TYPE_COLORS[active.types[0]].chip;
   const total = Object.values(active.stats).reduce((a, b) => a + b, 0);
   const altForms = full.forms.filter((f) => !f.isDefault);
-  const hasEvolution = full.evolution.children.length > 0;
 
   return (
     <div className="detail-grid">
@@ -96,26 +95,12 @@ export function DetailPanels({
         </Suspense>
       </section>
 
-      {hasEvolution && (
-        <section className="panel panel-evo">
-          <header className="panel-h">
-            <h3>Evolution</h3>
-            <span className="panel-tag">
-              {evoLabel(full.evolution)}
-              {full.babyTriggerItem
-                ? ` · Baby: ${full.babyTriggerItem.replace(/-/g, " ")}`
-                : ""}
-            </span>
-          </header>
-          <div>
-            <EvoTree
-              node={full.evolution}
-              liteById={liteById}
-              currentId={full.id}
-            />
-          </div>
-        </section>
-      )}
+      <Suspense fallback={null}>
+        <EvolutionPanel
+          currentId={full.id}
+          evolutionPromise={evolutionPromise}
+        />
+      </Suspense>
 
       {altForms.length > 0 && (
         <section className="panel panel-forms">
