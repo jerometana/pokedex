@@ -491,7 +491,6 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
     babyTriggerItem: chain.baby_trigger_item?.name ?? null,
     flavor: cleanText(pickFlavor(species)),
     art: ART(pkmn.id),
-    sprite: SPRITE(pkmn.id),
     forms,
     formTags,
     rarity: rarityFor(pkmn.id),
@@ -592,7 +591,6 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
       gen,
       types,
       art: ART(id),
-      sprite: SPRITE(id),
       formTags: Array.from(tagsBySpeciesId.get(id) ?? []),
       rarity: rarityFor(id),
     });

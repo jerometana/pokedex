@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -16,9 +17,14 @@ import {
 import { CatalogGrid } from "../_components/catalog-grid";
 import { Empty } from "../_components/empty";
 import { FilterBar } from "../_components/filter-bar";
-import { ImageSearchModal } from "../_components/image-search-modal";
 import { useTweaks } from "../_components/tweaks";
 import type { ImageSearchResult } from "@/lib/image-search";
+
+const ImageSearchModal = dynamic(
+  () =>
+    import("../_components/image-search-modal").then((m) => m.ImageSearchModal),
+  { ssr: false },
+);
 
 const Q_KEY = "q";
 const GENS_KEY = "gens";
@@ -265,11 +271,13 @@ export function CatalogClient({ pokemon }: { pokemon: PokemonLite[] }) {
         onClearImageSearch={clearImageSearch}
         count={filtered.length}
       />
-      <ImageSearchModal
-        open={imageModalOpen}
-        onClose={() => setImageModalOpen(false)}
-        onResults={handleImageResults}
-      />
+      {imageModalOpen && (
+        <ImageSearchModal
+          open={imageModalOpen}
+          onClose={() => setImageModalOpen(false)}
+          onResults={handleImageResults}
+        />
+      )}
       <main className="main">
         {filtered.length === 0 ? (
           <Empty />
