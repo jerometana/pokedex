@@ -23,6 +23,44 @@ const STAT_ROWS: [string, keyof PokemonFull["stats"]][] = [
   ["SPD", "spd"],
 ];
 
+function MovepoolSkeleton() {
+  return (
+    <div className="movepool" aria-busy="true" aria-live="polite">
+      <div className="movepool-tabs">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <span
+            key={i}
+            className="skeleton-bar"
+            style={{ height: 26, width: 84, borderRadius: 999 }}
+          />
+        ))}
+      </div>
+      <div className="movepool-scroll" style={{ padding: 12 }}>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              padding: "8px 0",
+              borderBottom: "1px dashed var(--line-2)",
+            }}
+          >
+            <span className="skeleton-bar" style={{ height: 12, width: 28, borderRadius: 6 }} />
+            <span className="skeleton-bar" style={{ height: 12, flex: 1, borderRadius: 6 }} />
+            <span className="skeleton-bar" style={{ height: 16, width: 48, borderRadius: 999 }} />
+            <span className="skeleton-bar" style={{ height: 16, width: 56, borderRadius: 999 }} />
+            <span className="skeleton-bar" style={{ height: 12, width: 28, borderRadius: 6 }} />
+            <span className="skeleton-bar" style={{ height: 12, width: 28, borderRadius: 6 }} />
+            <span className="skeleton-bar" style={{ height: 12, width: 28, borderRadius: 6 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function vgLabel(slug: string | null): string {
   if (!slug) return "";
   return slug
@@ -90,7 +128,7 @@ export function DetailPanels({
             {full.versionGroup ? ` · ${vgLabel(full.versionGroup)}` : ""}
           </span>
         </header>
-        <Suspense fallback={null}>
+        <Suspense fallback={<MovepoolSkeleton />}>
           <MovesPanel movepool={full.movepool} movesPromise={movesPromise} />
         </Suspense>
       </section>

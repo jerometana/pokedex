@@ -28,6 +28,34 @@ const MAX_ID = 1025;
 
 const P = new Pokedex({ cacheLimit: REVALIDATE_SECONDS * 1000 });
 
+const POKEAPI_BASE = "https://pokeapi.co/api/v2";
+
+async function fetchPokeApi<T>(path: string): Promise<T> {
+  const res = await fetch(`${POKEAPI_BASE}${path}`, {
+    next: { revalidate: REVALIDATE_SECONDS },
+  });
+  if (!res.ok) throw new Error(`PokeAPI ${path} ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let i = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (true) {
+      const idx = i++;
+      if (idx >= items.length) return;
+      out[idx] = await fn(items[idx]);
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+
 const ART = (id: number) =>
   `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 const SPRITE = (id: number) =>
@@ -254,9 +282,10 @@ function buildFormAbilities(pkmn: Pokedex.Pokemon): Ability[] {
 async function buildForm(
   variety: { pokemon: { name: string; url: string }; is_default: boolean },
   speciesSlug: string,
+  cached?: Pokedex.Pokemon,
 ): Promise<{ form: PokemonForm; raw: Pokedex.Pokemon } | null> {
   try {
-    const pkmn = await P.getPokemonByName(variety.pokemon.name);
+    const pkmn = cached ?? await P.getPokemonByName(variety.pokemon.name);
     const types = [...pkmn.types]
       .sort((a, b) => a.slot - b.slot)
       .map((t) => t.type.name as PokeType);
@@ -375,8 +404,9 @@ function cleanText(s: string): string {
 
 async function fetchAbilityDetails(slugs: string[]): Promise<Record<string, AbilityDetail>> {
   if (slugs.length === 0) return {};
-  const list = await P.getAbilityByName(slugs);
-  const arr = Array.isArray(list) ? list : [list];
+  const arr = await Promise.all(
+    slugs.map((s) => fetchPokeApi<Pokedex.Ability>(`/ability/${s}/`)),
+  );
   const out: Record<string, AbilityDetail> = {};
   for (const a of arr) {
     out[a.name] = {
@@ -390,8 +420,9 @@ async function fetchAbilityDetails(slugs: string[]): Promise<Record<string, Abil
 
 async function fetchMoveDetails(slugs: string[]): Promise<Record<string, MoveDetail>> {
   if (slugs.length === 0) return {};
-  const list = await P.getMoveByName(slugs);
-  const arr = Array.isArray(list) ? list : [list];
+  const arr = await Promise.all(
+    slugs.map((s) => fetchPokeApi<Pokedex.Move>(`/move/${s}/`)),
+  );
   const out: Record<string, MoveDetail> = {};
   for (const m of arr) {
     out[m.name] = {
@@ -409,29 +440,24 @@ async function fetchMoveDetails(slugs: string[]): Promise<Record<string, MoveDet
   return out;
 }
 
-let DAMAGE_RELATIONS_PROMISE: Promise<DamageRelations> | null = null;
 async function getDamageRelations(): Promise<DamageRelations> {
-  if (!DAMAGE_RELATIONS_PROMISE) {
-    DAMAGE_RELATIONS_PROMISE = (async () => {
-      const list = await P.getTypeByName(ALL_TYPES as unknown as string[]);
-      const arr = Array.isArray(list) ? list : [list];
-      const out = {} as DamageRelations;
-      for (const t of arr) {
-        const r = t.damage_relations;
-        const rel: TypeRelation = {
-          doubleFrom: r.double_damage_from.map((x) => x.name as PokeType),
-          halfFrom: r.half_damage_from.map((x) => x.name as PokeType),
-          noFrom: r.no_damage_from.map((x) => x.name as PokeType),
-          doubleTo: r.double_damage_to.map((x) => x.name as PokeType),
-          halfTo: r.half_damage_to.map((x) => x.name as PokeType),
-          noTo: r.no_damage_to.map((x) => x.name as PokeType),
-        };
-        out[t.name as PokeType] = rel;
-      }
-      return out;
-    })();
+  const arr = await Promise.all(
+    ALL_TYPES.map((t) => fetchPokeApi<Pokedex.Type>(`/type/${t}/`)),
+  );
+  const out = {} as DamageRelations;
+  for (const t of arr) {
+    const r = t.damage_relations;
+    const rel: TypeRelation = {
+      doubleFrom: r.double_damage_from.map((x) => x.name as PokeType),
+      halfFrom: r.half_damage_from.map((x) => x.name as PokeType),
+      noFrom: r.no_damage_from.map((x) => x.name as PokeType),
+      doubleTo: r.double_damage_to.map((x) => x.name as PokeType),
+      halfTo: r.half_damage_to.map((x) => x.name as PokeType),
+      noTo: r.no_damage_to.map((x) => x.name as PokeType),
+    };
+    out[t.name as PokeType] = rel;
   }
-  return DAMAGE_RELATIONS_PROMISE;
+  return out;
 }
 
 export async function getFullPokemon(id: number): Promise<PokemonFull> {
@@ -455,7 +481,9 @@ export async function getFullPokemon(id: number): Promise<PokemonFull> {
   }
 
   const formsRaw = await Promise.all(
-    species.varieties.map((v) => buildForm(v, species.name)),
+    species.varieties.map((v) =>
+      buildForm(v, species.name, v.pokemon.name === pkmn.name ? pkmn : undefined),
+    ),
   );
   const formBundles = formsRaw.filter(
     (f): f is { form: PokemonForm; raw: Pokedex.Pokemon } => f !== null,
@@ -668,8 +696,8 @@ export async function getAllPokemonLite(): Promise<PokemonLite[]> {
   const speciesIds = baseEntries
     .map((e) => e.id)
     .filter((id) => typesByPokemonId.has(id) && genByPokemonId.has(id));
-  const speciesList = await P.getPokemonSpeciesByName(
-    speciesIds as unknown as string[],
+  const speciesList = await mapWithConcurrency(speciesIds, 24, (id) =>
+    fetchPokeApi<Pokedex.PokemonSpecies>(`/pokemon-species/${id}/`),
   );
   const romajiBySpeciesId = new Map<number, string | null>();
   for (const sp of speciesList) {
