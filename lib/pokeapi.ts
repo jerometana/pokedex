@@ -32,6 +32,7 @@ const POKEAPI_BASE = "https://pokeapi.co/api/v2";
 
 async function fetchPokeApi<T>(path: string): Promise<T> {
   const res = await fetch(`${POKEAPI_BASE}${path}`, {
+    cache: "force-cache",
     next: { revalidate: REVALIDATE_SECONDS },
   });
   if (!res.ok) throw new Error(`PokeAPI ${path} ${res.status}`);
@@ -461,7 +462,7 @@ async function getDamageRelations(): Promise<DamageRelations> {
 }
 
 export async function getFullPokemon(id: number): Promise<PokemonFull> {
-  "use cache";
+  "use cache: remote";
   cacheLife("max");
   cacheTag(`pokemon:${id}`);
   const [pkmn, species, damageRelations] = await Promise.all([
@@ -535,7 +536,7 @@ export type PokemonEvolutionBundle = {
 export async function getPokemonEvolution(
   id: number,
 ): Promise<PokemonEvolutionBundle> {
-  "use cache";
+  "use cache: remote";
   cacheLife("max");
   cacheTag(`pokemon:${id}:evolution`);
 
@@ -570,7 +571,7 @@ export async function getPokemonEvolution(
 export async function getPokemonAbilityDetail(
   id: number,
 ): Promise<Record<string, AbilityDetail>> {
-  "use cache";
+  "use cache: remote";
   cacheLife("max");
   cacheTag(`pokemon:${id}:abilities`);
 
@@ -593,7 +594,7 @@ export async function getPokemonAbilityDetail(
 export async function getPokemonMoveDetail(
   id: number,
 ): Promise<Record<string, MoveDetail>> {
-  "use cache";
+  "use cache: remote";
   cacheLife("max");
   cacheTag(`pokemon:${id}:moves`);
 
@@ -628,7 +629,7 @@ function deriveFormTags(speciesSlug: string, formSlugs: string[]): FormCategory[
 }
 
 export async function getAllPokemonLite(): Promise<PokemonLite[]> {
-  "use cache";
+  "use cache: remote";
   cacheLife("max");
   cacheTag("pokemon:list");
   const typeResults = await P.getTypeByName(TYPE_NAMES as unknown as string[]);
