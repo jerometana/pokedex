@@ -1,0 +1,12 @@
+---
+import Base from "@/layouts/Base.astro";
+import { CatalogClient } from "@/clients/catalog-client";
+import liteData from "@/data/index.json";
+import type { PokemonLite } from "@/lib/types";
+
+const pokemon = liteData as PokemonLite[];
+---
+
+<Base>
+  <CatalogClient pokemon={pokemon} client:load />
+</Base>

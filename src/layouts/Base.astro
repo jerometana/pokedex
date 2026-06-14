@@ -1,0 +1,53 @@
+---
+import "@/styles/globals.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Pokédex",
+  description = "Modern, white, rounded, polished Pokédex.",
+} = Astro.props;
+
+// Restore persisted theme/type-scale before paint to avoid a flash.
+const THEME_INIT = `(function(){try{var s=localStorage.getItem("pokedex.tweaks");if(!s)return;var t=JSON.parse(s);var r=document.documentElement;if(t.mode==="dark"||t.mode==="light")r.dataset.theme=t.mode;if(typeof t.typeScale==="number")r.style.setProperty("--type-scale",String(t.typeScale/100));}catch(e){}})();`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <script is:inline set:html={THEME_INIT} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+    />
+    <link
+      rel="preconnect"
+      href="https://raw.githubusercontent.com"
+      crossorigin="anonymous"
+    />
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
+
+    <style is:global>
+      :root {
+        --font-bricolage: "Bricolage Grotesque";
+        --font-dm-sans: "DM Sans";
+        --font-jetbrains-mono: "JetBrains Mono";
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
