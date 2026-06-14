@@ -1,0 +1,59 @@
+---
+import Base from "@/layouts/Base.astro";
+import { DetailClient } from "@/clients/detail-client";
+import liteData from "@/data/index.json";
+import damageRelationsData from "@/data/type-relations.json";
+import type {
+  DamageRelations,
+  PageSnapshot,
+  PokemonFull,
+  PokemonLite,
+} from "@/lib/types";
+
+const all = liteData as PokemonLite[];
+
+export function getStaticPaths() {
+  return (liteData as PokemonLite[]).map((p) => ({
+    params: { id: String(p.id) },
+  }));
+}
+
+const { id } = Astro.params;
+const numId = Number(id);
+
+// Lazily load only this Pokémon's snapshot file.
+const snapshots = import.meta.glob<{ default: PageSnapshot }>(
+  "../../data/pokemon/*.json",
+);
+const loader = snapshots[`../../data/pokemon/${id}.json`];
+if (!loader) return Astro.redirect("/404");
+const snap = (await loader()).default;
+
+const damageRelations = damageRelationsData as DamageRelations;
+const full = { ...snap.full, damageRelations } as PokemonFull;
+
+const total = all.length;
+const idx = Math.max(
+  0,
+  all.findIndex((p) => p.id === numId),
+);
+const wrap = (i: number) => all[((i % total) + total) % total];
+const neighbors = {
+  prev2: wrap(idx - 2),
+  prev: wrap(idx - 1),
+  next: wrap(idx + 1),
+  next2: wrap(idx + 2),
+};
+---
+
+<Base title={`#${id} ${full.name} · Pokédex`} description={full.flavor}>
+  <DetailClient
+    client:load
+    full={full}
+    neighbors={neighbors}
+    idx={idx}
+    total={total}
+    evolution={snap.evolution}
+    damageRelations={damageRelations}
+  />
+</Base>
